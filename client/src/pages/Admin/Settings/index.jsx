@@ -44,6 +44,9 @@ export default function Settings() {
         return;
       }
   
+      const isEmailChanged = data.email !== user.info.email;
+      const isPasswordChanged = data.oldPassword && data.newPassword;
+  
       const res = await fetch(BACKEND_URL + '/api/v1/users', {
         method: 'PATCH',
         body: JSON.stringify(data),
@@ -65,9 +68,10 @@ export default function Settings() {
       }
   
       setIsSafeToReset(true);
-      await updateInfo();
+      await updateInfo(isEmailChanged || isPasswordChanged); 
   
-      
+      setIsModified(false); 
+  
       if (isSafeToReset) {
         logout();
       }
@@ -78,13 +82,17 @@ export default function Settings() {
   };
   
   
+  
+  
 
 
   useEffect(() => {
     if (!isSafeToReset) return;
-
-    reset(defaultValues); 
+  
+    reset(defaultValues);
+    setIsSafeToReset(false); 
   }, [reset, isSafeToReset]);
+  
 
   return (
     <div className={styles.container}>

@@ -40,24 +40,25 @@ export default function AuthProvider({ children }) {
           Authorization: 'Bearer ' + user.token,
         },
       });
-
+  
       if (!res.ok) {
         const errJson = await res.json();
         throw new Error(errJson.message);
       }
-
+  
       const resObj = await res.json();
       const updatedUser = { ...user, info: resObj.data.info };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
-
+  
       if (shouldLogout) {
-        logout(); 
+        logout();
       }
     } catch (error) {
       console.log(error.message);
     }
   };
+  
 
   return (
     <AuthContext.Provider
