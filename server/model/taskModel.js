@@ -24,12 +24,12 @@ const taskSchema = new mongoose.Schema(
       required: true,
     },
     assignee: {
-      type: String, 
-      default: null, 
+      type: String,
+      default: null,
     },
     shared: {
       type: Boolean,
-      // default: false,
+      default: false,
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
@@ -50,7 +50,9 @@ const taskSchema = new mongoose.Schema(
       enum: ['backlog', 'inProgress', 'todo', 'done'],
       default: 'todo',
     },
-    dueDate: { type: Date },
+    dueDate: {
+      type: Date,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -82,14 +84,14 @@ taskSchema.pre('save', async function (next) {
       });
       if (user) {
         this.shared = true;
-        this.assignedTo = user._id; 
+        this.assignedTo = user._id; // Assign the ObjectId of the found user
       } else {
         this.shared = false;
-        this.assignedTo = null; 
+        // Do not change this.assignedTo if assignee is not found
       }
     } else {
       this.shared = false;
-      this.assignedTo = null; 
+      this.assignedTo = null; // Assignee is null, reset assignedTo to null
     }
   }
   next();

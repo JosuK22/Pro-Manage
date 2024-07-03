@@ -29,30 +29,24 @@ exports.getUser = catchAsync(async (req, res) => {
 });
 
 exports.updateUser = catchAsync(async (req, res) => {
-  const { name, newPassword, oldPassword } = req.body;
+  const { name, email, newPassword, oldPassword } = req.body;
   let hashPassword;
 
   if (newPassword) {
     if (!oldPassword) {
-      throw new AppError(
-        'You must provide your old password to update your password.',
-        400
-      );
-    } else {
-      const user = await User.findById(req.user._id).select('+password');
-
-      if (!(await user.comparePasswords(oldPassword, user.password))) {
-        throw new AppError('Old password is incorrect');
-      }
-
-      hashPassword = await bcrypt.hash(newPassword, 12);
+      throw new AppError('You must provide your current password to update your password.', 400);
     }
+
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!(await user.comparePasswords(oldPassword, user.password))) {
+      throw new AppError('Old password is incorrect', 401);
+    }
+
+    hashPassword = await bcrypt.hash(newPassword, 12);
   }
 
-  const updatedObj = filterObject({ name: name, password: hashPassword }, [
-    'password',
-    'name',
-  ]);
+  const updatedObj = filterObject({ name, email, password: hashPassword }, ['password', 'name', 'email']);
 
   const updatedUser = await User.findByIdAndUpdate(req.user._id, updatedObj, {
     new: true,

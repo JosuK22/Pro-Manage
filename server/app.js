@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  return res.status(200).send('Welcome to My server ✌️');
+  return res.status(200).send('Welcome to My server');
 });
 
 app.get('/api/v1/', (req, res) => {
