@@ -38,13 +38,13 @@ export default function Text({
       stepStyle = styles.stepEight;
       break;
     default:
-      stepStyle = styles.stepThree; // Default to step three if step value is not provided
+      stepStyle = styles.stepThree; 
   }
 
   const fontStyles = {
     fontWeight: weight,
     color: color,
-    fontFamily: fontFamily, // Apply the specified font family
+    fontFamily: fontFamily, 
     ...style,
   };
 
@@ -62,5 +62,5 @@ Text.propTypes = {
   style: PropTypes.object,
   children: PropTypes.any,
   className: PropTypes.string,
-  fontFamily: PropTypes.string, // PropTypes for the new fontFamily prop
+  fontFamily: PropTypes.string, 
 };

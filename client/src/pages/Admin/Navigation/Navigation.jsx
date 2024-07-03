@@ -34,21 +34,26 @@ export default function Navigation() {
             to="/"
             className={({ isActive }) => (isActive ? styles.active : '')}
           > 
-                      
-            <div className={styles.icon}>
-              <PanelsTopLeft color="#767575" />
-            </div>
-            <Text weight="500">Board</Text>
+            <div className={styles.link}>
+              <div className={styles.icon}>
+                <PanelsTopLeft color="#767575" />
+              </div>
+              <Text weight="500">Board</Text>  
+            </div>          
+            
+            
           </NavLink>
 
           <NavLink
             to={'analytics'}
             className={({ isActive }) => (isActive ? styles.active : '')}
           >
+            
             <div className={styles.icon}>
               <Database color="#767575" />
             </div>
             <Text weight="500">Analytics</Text>
+
           </NavLink>
 
           <NavLink

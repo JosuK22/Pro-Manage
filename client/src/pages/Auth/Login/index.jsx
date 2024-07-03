@@ -45,7 +45,6 @@ export default function Login() {
       const res = await fetch(
         
         BACKEND_URL + '/api/v1/auth/login',
-        // "http://localhost:3003/" + '/auth/login',
         {
           method: 'POST',
           body: JSON.stringify(data),

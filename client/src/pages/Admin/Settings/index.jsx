@@ -39,7 +39,6 @@ export default function Settings() {
 
   const onSubmit = async (data) => {
     try {
-      // Check if newPassword is provided and validate against oldPassword
       if (data.oldPassword && data.newPassword === data.oldPassword) {
         toast.error("New password cannot be the same as the old password");
         return;

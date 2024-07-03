@@ -5,7 +5,7 @@ import { BACKEND_URL } from '../utils/connection';
 export const AuthContext = createContext({
   user: {},
   login: () => {},
-  logout: () => {}, // Include logout function in the default context
+  logout: () => {}, 
   isLoading: true,
   updateInfo: async () => {},
 });
@@ -52,7 +52,7 @@ export default function AuthProvider({ children }) {
       localStorage.setItem('user', JSON.stringify(updatedUser));
 
       if (shouldLogout) {
-        logout(); // Perform logout if shouldLogout is true
+        logout(); 
       }
     } catch (error) {
       console.log(error.message);

@@ -29,7 +29,7 @@ const taskSchema = new mongoose.Schema(
     },
     shared: {
       type: Boolean,
-      default: false,
+      // default: false,
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
@@ -82,14 +82,14 @@ taskSchema.pre('save', async function (next) {
       });
       if (user) {
         this.shared = true;
-        this.assignedTo = user._id; // Set assignedTo to the user's _id
+        this.assignedTo = user._id; 
       } else {
         this.shared = false;
-        this.assignedTo = null; // Clear assignedTo if user is not found
+        this.assignedTo = null; 
       }
     } else {
       this.shared = false;
-      this.assignedTo = null; // Clear assignedTo if assignee is null
+      this.assignedTo = null; 
     }
   }
   next();

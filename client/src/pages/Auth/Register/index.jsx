@@ -50,7 +50,7 @@ export default function Register() {
   });
 
   const onSubmit = async (data) => {
-    // console.log("Submitted data:", data);
+   
     try {
       const res = await fetch(
         BACKEND_URL + '/api/v1/auth/register',
@@ -83,20 +83,19 @@ export default function Register() {
     }
   };
   
-  useEffect(() => {
-    console.log(BACKEND_URL+ "/auth/"); // <-- Console log to verify VITE_BACKEND_URL
-  }, []);
+  // useEffect(() => {
+  //   console.log(BACKEND_URL+ "/auth/"); 
+  // }, []);
 
-  //https://stackoverflow.com/questions/62741410/react-hook-form-empty-input-field-after-each-submit
   useEffect(() => {
     if (!isSafeToReset) return;
 
-    reset(defaultValues); // asynchronously reset your form values
+    reset(defaultValues); 
   }, [reset, isSafeToReset]);
 
-  useEffect(() => {
-    console.log(BACKEND_URL); // <-- Console log to verify VITE_BACKEND_URL
-  }, []);
+  // useEffect(() => {
+  //   console.log(BACKEND_URL);
+  // }, []);
   return (
     <Form title="Register">
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>

@@ -26,6 +26,11 @@
   height: 100%;
   object-fit: contain;
 }
+.link{
+  display: flex;
+  gap: 1rem;
+  margin-right: 25px;
+}
 .logolinkContainer{
 display: flex;
 flex-direction: column;
@@ -35,12 +40,14 @@ justify-content: center;
 .links{
   display: flex;
   flex-direction: column;
-  width: 180px;
+  width: 250px;
   justify-content: center;
-  align-items: flex-start;
+  align-items: left;
 }
 .links > * {
   opacity: 0.6;
+  width: 100%;
+  
 }
 
 .links > *:hover,

@@ -5,8 +5,6 @@ import { BACKEND_URL } from '../../../utils/connection';
 
 import './styles.css';
 
-
-// Custom SingleValue component to only display the email in the input bar
 const SingleValue = ({ children, ...props }) => (
   <components.SingleValue {...props}>
     {props.data.label}
@@ -18,7 +16,7 @@ export default function Dropdown({ onChange, assignedValue }) {
   const { token } = user;
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null); // Track selected option
+  const [selectedOption, setSelectedOption] = useState(null); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +45,7 @@ export default function Dropdown({ onChange, assignedValue }) {
 
         setOptions(formattedOptions);
 
-        // Set selected option based on assignedValue
+        
         if (assignedValue) {
           const selected = formattedOptions.find(option => option.value === assignedValue);
           setSelectedOption(selected);
@@ -64,8 +62,8 @@ export default function Dropdown({ onChange, assignedValue }) {
   }, [token, assignedValue]);
 
   const handleOnChange = (selectedOption) => {
-    setSelectedOption(selectedOption); // Update selected option state
-    onChange(selectedOption); // Propagate change to parent component
+    setSelectedOption(selectedOption); 
+    onChange(selectedOption); 
   };
 
   const getOptionLabel = (option) => (
@@ -83,8 +81,8 @@ export default function Dropdown({ onChange, assignedValue }) {
   return (
     <Select
       options={options}
-      value={selectedOption} // Set selected option
-      onChange={handleOnChange} // Handle change event
+      value={selectedOption} 
+      onChange={handleOnChange} 
       placeholder="Add an assignee"
       isSearchable
       isClearable
@@ -96,7 +94,7 @@ export default function Dropdown({ onChange, assignedValue }) {
       }}
       isLoading={isLoading}
       getOptionLabel={getOptionLabel}
-      components={{ SingleValue }} // Use custom SingleValue component
+      components={{ SingleValue }} 
       className='react-select-container'
       classNamePrefix="react-select"
     />
