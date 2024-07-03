@@ -1,0 +1,10 @@
+.container {
+  flex: 1;
+}
+
+.categories {
+  height: calc(-8.7rem + 100vh);
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+}

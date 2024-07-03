@@ -1,0 +1,201 @@
+.container {
+  background-color: var(--main-color);
+  padding: 1rem ;
+  height: auto;
+  width: 100%;
+  border-radius: 20px;
+  margin: .5rem 0px;
+  box-shadow:var(--box-shadow);
+  overflow: hidden;
+}
+
+.groupOne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.moderate {
+  color: #18b0ff;
+  font-size: 2rem;
+}
+
+.low {
+  color: #63c05b;
+  font-size: 2rem;
+}
+
+.high {
+  color: #ff2473;
+  font-size: 2rem;
+}
+
+.initial{
+  width: 25px;
+  height: 25px;
+  background: #FFEBEB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  text-transform: uppercase;
+  margin-left: -20px ;
+  cursor: pointer;
+}
+
+.badges {
+  margin-top: 2.2rem;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.categoryBadges {
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.menu {
+  position: relative;
+  z-index: 5;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.menuItems {
+  position: absolute;
+  list-style-type: none;
+  right: 0;
+  box-shadow: var(--box-shadow);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: var(--main-color);
+}
+
+.menuItem {
+  width: 120px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+  margin: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.active {
+  background-color: #4391ed10;
+}
+
+.selected {
+  background-color: var(--primary);
+  color: var(--main-color);
+  box-shadow: 0 20px 10px -20px rgba(0, 0, 0, 0.45) inset;
+}
+
+.error {
+  color: red;
+}
+
+.error:hover {
+  background-color: #ff0b0b10;
+}
+.deletecontent{
+  padding: .2rem 2rem;
+}
+.deleteActions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-title-container {
+  position: relative;
+  display: inline-block;
+  width: 60%; 
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  margin-top: 1rem; 
+  margin-bottom: 1.8rem;
+}
+
+.tooltip {
+  visibility: hidden;
+  background-color: #333;
+  color: var(--main-color);
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  position: absolute;
+  z-index: 10;
+  left: 70%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  margin-bottom: 5px; 
+}
+.tooltip::before {
+  position: absolute;
+  content: "";
+  height: 0.6em;
+  width: 0.6em;
+  bottom: -0.2em;
+  left: 30%;
+  transform: translate(-50%) rotate(45deg);
+  background:#333;
+}
+
+.card-title-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  animation: rise 0.3s ease-in-out both;
+}
+
+.text-truncate {
+  display: block;
+  max-width: 150px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes rise {
+  0% {
+    
+    bottom: 30%;
+  }
+
+  25% {
+    
+    bottom: 60%;
+  }
+
+  50% {
+    
+    bottom: 80%;
+  }
+
+  75% {
+    
+    bottom: 90%;
+  }
+
+  100% {
+    
+    bottom: 110%;
+  }
+}

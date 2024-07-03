@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.navigation {
+  width: 250px;
+  border-right: 2px solid #edf5fe;
+  height: 100%;
+}
+
+.outlet {
+  overflow: hidden;
+  flex: 1;
+  /* background-color: aqua; */
+  padding: 1.5rem 1.5rem .5rem 1.5rem;
+}

@@ -1,0 +1,61 @@
+.container {
+  padding: 3rem 2rem;
+  border: 2px solid #edf5fe;
+  width: 40%;
+  max-width: 640px;
+  min-width: 450px;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow: hidden;
+}
+
+.moderate {
+  color: #18b0ff;
+  font-size: 2rem;
+}
+
+.low {
+  color: #63c05b;
+  font-size: 2rem;
+}
+
+.high {
+  color: #ff2473;
+  font-size: 2rem;
+}
+
+.lists {
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  overflow-y: auto;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 2px solid #e2e2e2;
+  border-radius: 0.75rem;
+}
+
+.list input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+}
+
+.list input[type='checkbox'][disabled] {
+  accent-color: var(--primary);
+}
+
+.dueDate {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}

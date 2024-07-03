@@ -1,0 +1,21 @@
+.container form {
+  max-width: 500px;
+  margin-top: 2rem;
+}
+
+.container form > * {
+  margin-top: 1rem;
+}
+
+.container button {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.toaster{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+}

@@ -1,0 +1,15 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #e2e2e2;
+  border-radius: 15px;
+  margin: 1rem 1rem 1rem 0px;
+}
+.container input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+  overflow: hidden;
+}

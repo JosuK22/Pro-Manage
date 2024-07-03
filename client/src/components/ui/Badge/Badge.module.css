@@ -1,0 +1,19 @@
+.badge {
+  background-color: #eeecec;
+  color: #767575;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.325rem;
+  cursor: pointer;
+
+  max-width: fit-content;
+}
+
+.error {
+  background-color: #cf3636;
+  color: white;
+}
+
+.success {
+  background-color: #63c05b;
+  color: white;
+}

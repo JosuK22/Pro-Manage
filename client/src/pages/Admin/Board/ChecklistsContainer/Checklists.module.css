@@ -1,0 +1,17 @@
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.button {
+  border: none;
+  display: flex;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--box-shadow);
+}
+
+.rotate {
+  transform: rotate(180deg);
+}

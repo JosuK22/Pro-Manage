@@ -1,0 +1,19 @@
+.container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.container > p {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.navigation {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.navigation button {
+  width: 100%;
+  margin-top: 1rem;
+}

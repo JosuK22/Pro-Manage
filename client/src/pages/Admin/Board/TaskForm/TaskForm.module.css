@@ -1,0 +1,158 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 596px;
+  min-width: 700px;
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.325rem;
+  font-family: Inter;
+  
+}
+.input2 {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  font-family: Inter;
+}
+.input input{
+  width: 100%;
+  border: 2px solid var(--neutral);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+}
+.input2 input{
+  width: 85%;
+  border: 2px solid var(--neutral);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  margin-left: 1.4rem;
+} 
+.input input:focus {
+  outline: none;
+}
+.label{
+  width: 15%;
+}
+.dropdown{
+  width: 85%;
+}
+.radioGroup {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-content: space-between;
+}
+
+.radioOptions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.radioOption {
+  padding: 0.5rem;
+  border: 2px solid var(--neutral);
+  border-radius: 0.5rem;
+  font-size: 0.5rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.checkedOption {
+  background-color: var(--neutral);
+}
+
+.radioOption p {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.radioOption > p span {
+  font-size: 2rem;
+}
+
+.buttonGroup {
+  display: flex;
+}
+
+.actions {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+
+
+.lists {
+  max-height: 19vh;
+  min-height: 19vh;
+  max-width: 100%;
+  min-width: 98%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.list {
+  display: flex;
+  gap: 1rem;
+  max-width: 600px;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--neutral);
+  border-radius: 0.75rem;
+  align-items: center;
+  
+}
+
+.list input[type='text'] {
+  flex: 1;
+  border: none;
+  font-size: 1rem;
+}
+
+.list input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+}
+
+.list input[type='text']:focus,
+.list input[type='text']:active {
+  outline: none;
+}
+
+.list button {
+  background-color: transparent;
+  border: none;
+  color: red;
+  display: flex;
+}
+
+.addButton {
+  margin-top: 0.5rem;
+}
+
+.datePickerContainer{
+  position: absolute;
+  top: 30%;
+  right: 35%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

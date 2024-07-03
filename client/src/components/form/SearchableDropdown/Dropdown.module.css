@@ -1,0 +1,27 @@
+.react-select-container {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.react-select .react-select__control {
+  border-radius: 10px;
+}
+
+.react-select .react-select__indicators {
+  background-color: violet;
+}
+
+.react-select__menu {
+  background-color: goldenrod;
+  max-height: 150px;
+  overflow-y: hidden;
+}
+
+.react-select__menu-list {
+  background-color: blue;
+  overflow-y: hidden;
+}
+
+.react-select__option {
+  height: 80px;
+}
