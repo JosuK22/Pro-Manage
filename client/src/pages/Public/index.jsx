@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import useFetch from '../../hooks/useFetch';
 import PublicCard from './PublicCard/PublicCard';
-import { Text } from '../../components/ui';
+import { Text , AstroLoader} from '../../components/ui';
 import { BACKEND_URL } from '../../utils/connection';
 import styles from './index.module.css';
 
@@ -15,7 +15,7 @@ export default function PublicLayout() {
   let content;
 
   if (isLoading) {
-    content = <p>Loading...</p>;
+    content = <AstroLoader/>;
   }
 
   if (error) {

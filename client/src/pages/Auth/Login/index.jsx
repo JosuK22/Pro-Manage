@@ -8,9 +8,10 @@ import { Eye, Lock, Mail, EyeOff } from 'lucide-react';
 
 import { AuthContext } from '../../../store/AuthProvider.jsx';
 import FormInput from '../../../components/form/InputBar/FormInput.jsx';
-import {Button} from '../../../components/ui';
+import {Button, LineLoader} from '../../../components/ui';
 import Form from '../Form/Form.jsx';
 import { BACKEND_URL } from '../../../utils/connection.js';
+// import LineLoader from '../../../components/ui/Loaders/ButtonLoader/ButtonLoader.jsx'
 
 import styles from './styles.module.css';
 
@@ -89,7 +90,7 @@ export default function Login() {
           tertiaryIcon ={<EyeOff/>}
         />
 
-        <Button>{isSubmitting ? 'Logging in...' : 'Login'}</Button>
+        <Button>{isSubmitting ? <LineLoader /> : 'Login'}</Button>
       </form>
     </Form>
   );
