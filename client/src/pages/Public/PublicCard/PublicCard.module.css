@@ -2,11 +2,13 @@
   padding: 3rem 2rem;
   border: 2px solid #edf5fe;
   width: 40%;
+  min-width: 350px;
+  max-width: 550px;
   border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  overflow: hidden;
+  overflow: hidden; 
 }
 
 .header {
