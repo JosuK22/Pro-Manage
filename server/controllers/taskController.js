@@ -40,10 +40,6 @@ exports.getTask = catchAsync(async (req, res, next) => {
   const { taskId } = req.params;
   const task = await Task.findOne({
     _id: taskId,
-    $or: [
-      { createdBy: req.user._id },
-      { assignedTo: req.user._id }, 
-    ],
   });
 
   if (!task) {
