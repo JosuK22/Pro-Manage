@@ -77,23 +77,31 @@ exports.updateTask = catchAsync(async (req, res, next) => {
   const { title, priority, checklists, assignee, dueDate, status } = req.body;
 
   let shared = false;
+  let assignedTo = null;
   if (assignee) {
     const user = await User.findOne({ email: assignee });
     if (user) {
       shared = true;
     }
   }
+  if (assignee) {
+    const user = await User.findOne({ email: assignee });
+    if (user) {
+      assignedTo = user._id; // Update assignedTo with user's ObjectId
+    }
+  }
+
 
   const updatedTask = await Task.findOneAndUpdate(
     { _id: taskId, $or: [{ createdBy: req.user._id }, { assignedTo: req.user._id }] },
     {
-      title,
-      priority,
-      checklists,
-      assignee,
-      dueDate,
-      status,
-      shared,
+    title,
+    status,
+    priority,
+    checklists,
+    dueDate,
+    assignee,
+    assignedTo, 
     },
     { new: true, runValidators: true }
   );
@@ -168,3 +176,4 @@ exports.analytics = catchAsync(async (req, res, next) => {
     data: { status, priorities },
   });
 });
+
