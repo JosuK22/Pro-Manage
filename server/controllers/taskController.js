@@ -82,14 +82,15 @@ exports.updateTask = catchAsync(async (req, res, next) => {
     const user = await User.findOne({ email: assignee });
     if (user) {
       shared = true;
+      assignedTo = user._id;
     }
   }
-  if (assignee) {
-    const user = await User.findOne({ email: assignee });
-    if (user) {
-      assignedTo = user._id; // Update assignedTo with user's ObjectId
-    }
-  }
+  // if (assignee) {
+  //   const user = await User.findOne({ email: assignee });
+  //   if (user) {
+  //     assignedTo = user._id; 
+  //   }
+  // }
 
 
   const updatedTask = await Task.findOneAndUpdate(

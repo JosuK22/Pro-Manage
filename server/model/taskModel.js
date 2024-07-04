@@ -84,14 +84,14 @@ taskSchema.pre('save', async function (next) {
       });
       if (user) {
         this.shared = true;
-        this.assignedTo = user._id; // Assign the ObjectId of the found user
+        this.assignedTo = user._id; 
       } else {
         this.shared = false;
-        // Do not change this.assignedTo if assignee is not found
+        
       }
     } else {
       this.shared = false;
-      this.assignedTo = null; // Assignee is null, reset assignedTo to null
+      this.assignedTo = null; 
     }
   }
   next();
