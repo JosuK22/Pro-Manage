@@ -7,20 +7,32 @@ export default function Card({ task }) {
 
   return (
     <div className={styles.container}>
-      <Text
-        style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}
-        step={1}
-        color="#767575"
-        weight="500"
-      >
-        <span className={styles[task.priority]}>•</span>{' '}
-        {task.priority.toUpperCase()} PRIORITY
-      </Text>
+      <div className={styles.header}>
+        <Text
+          style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}
+          step={1}
+          color="#767575"
+          weight="500"
+        >
+          <span className={styles[task.priority]}>•</span>{' '}
+          {task.priority.toUpperCase()} PRIORITY
+        </Text>
 
-      <Text step={7} weight="500">
-        {task.title}
-      </Text>
-
+        {task.assignee && (
+          <div className={styles.assignee}>
+            <Text step={1}>{task.assignee.substring(0, 2)}</Text>
+          </div>
+        )}
+      </div>
+      
+        
+      <div className={styles['card-title-container']}>
+          <Text step={7} weight="500" className={styles['text-truncate']}>
+            {task.title}
+          </Text>
+          <div className={styles.tooltip}>{task.title}</div>
+      </div>
+      
       <div className={styles.checklists}>
         <Text weight="500">
           Checklists ({dones.length + '/' + task.checklists.length})
@@ -62,3 +74,4 @@ export default function Card({ task }) {
 Card.propTypes = {
   task: PropTypes.object,
 };
+

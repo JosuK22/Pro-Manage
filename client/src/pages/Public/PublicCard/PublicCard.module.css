@@ -9,13 +9,32 @@
   flex-direction: column;
   gap: 2rem;
   overflow: hidden;
+  
 }
-
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.assignee {
+  width: 50px;
+  height: 50px;
+  background: #FFEBEB;
+  display: flex;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  text-transform: uppercase;
+  
+  cursor: pointer;
+  
+}
 .moderate {
   color: #18b0ff;
   font-size: 2rem;
 }
-
 .low {
   color: #63c05b;
   font-size: 2rem;
@@ -24,6 +43,55 @@
 .high {
   color: #ff2473;
   font-size: 2rem;
+}
+
+.card-title-container {
+  position: relative;
+  display: inline-block;
+  width: 60%; 
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tooltip {
+  visibility: hidden;
+  background-color: #333;
+  color: var(--main-color);
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  position: absolute;
+  z-index: 10;
+  top: -160%;
+  left: 70%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  margin-bottom: 5px; 
+}
+.tooltip::before {
+  position: absolute;
+  content: "";
+  height: 0.6em;
+  width: 0.6em;
+  bottom: -0.2em;
+  left: 30%;
+  transform: translate(-50%) rotate(45deg);
+  background:#333;
+}
+
+.card-title-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.text-truncate {
+  display: block;
+  max-width: 150px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lists {
@@ -42,6 +110,7 @@
   padding: 0.75rem;
   border: 2px solid #e2e2e2;
   border-radius: 0.75rem;
+  /* background-color: #18b0ff; */
 }
 
 .list input[type='checkbox'] {
@@ -59,3 +128,4 @@
   gap: 1rem;
   margin-top: 0.5rem;
 }
+
