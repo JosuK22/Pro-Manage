@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Tooltip.module.css';
 
-const Tooltip = ({ tooltipText, children, width,height,position }) => {
+const Tooltip = ({ tooltipText, children, width,height,position, color }) => {
     const style = {
         '--tooltip-width': width || '40px',
         '--tooltip-height': height || '40px',
