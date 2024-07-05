@@ -6,6 +6,7 @@ const Tooltip = ({ tooltipText, children, width,height,position }) => {
         '--tooltip-width': width || '40px',
         '--tooltip-height': height || '40px',
         '--position' : position || 'absolute',
+        '--text-color' : color || '#333'
       };
   return (
     
