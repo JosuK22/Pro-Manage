@@ -18,8 +18,8 @@
   height: 70px;
 }
 .assignee {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   background: #FFEBEB;
   display: flex;
   z-index: 100;
@@ -62,7 +62,7 @@
   border-radius: 4px;
   padding: 4px 8px;
   position: absolute;
-  z-index: 10;
+  z-index: 100;
   top: -160%;
   left: 70%;
   transform: translateX(-50%);
@@ -110,7 +110,6 @@
   padding: 0.75rem;
   border: 2px solid #e2e2e2;
   border-radius: 0.75rem;
-  /* background-color: #18b0ff; */
 }
 
 .list input[type='checkbox'] {

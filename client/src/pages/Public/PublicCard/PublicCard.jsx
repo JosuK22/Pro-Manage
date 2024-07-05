@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { Text, Badge } from '../../../components/ui';
+import { Text, Badge,Tooltip } from '../../../components/ui';
 import styles from './PublicCard.module.css';
+// import Tooltip from '../../../components/ui/Tooltip/Tooltip'
 
 export default function Card({ task }) {
   const dones = task.checklists.filter((list) => list.checked);
@@ -18,11 +19,15 @@ export default function Card({ task }) {
           {task.priority.toUpperCase()} PRIORITY
         </Text>
 
-        {task.assignee && (
+        
           <div className={styles.assignee}>
-            <Text step={1}>{task.assignee.substring(0, 2)}</Text>
+            
+            <Tooltip tooltipText={task.assignee}>
+              <Text step={4}>{task.assignee.substring(0, 2)}</Text>
+            </Tooltip>
+
           </div>
-        )}
+       
       </div>
       
         

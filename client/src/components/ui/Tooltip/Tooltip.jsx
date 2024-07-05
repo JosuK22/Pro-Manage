@@ -1,0 +1,19 @@
+import React from 'react';
+import styles from './Tooltip.module.css';
+
+const Tooltip = ({ tooltipText, children, width,height,position }) => {
+    const style = {
+        '--tooltip-width': width || '40px',
+        '--tooltip-height': height || '40px',
+        '--position' : position || 'absolute',
+      };
+  return (
+    
+    <div className={styles.tooltipContainer} style={style}>
+      <span className={styles.tooltip}>{tooltipText}</span>
+      <span className={styles.text}>{children}</span>
+    </div>
+  );
+};
+
+export default Tooltip;

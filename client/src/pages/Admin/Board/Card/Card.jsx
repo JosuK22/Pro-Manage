@@ -61,11 +61,11 @@ export default function Card({ task, isOpen, toggleDisclosure }) {
           </Text>
           
           
-          {task.assignee && (
-            <div className={styles.initial}>
+            <div className={styles['initial-container']}>
               <Text step={1}>{task.assignee.substring(0, 2)}</Text>
+              <span className={styles.tooltip1}>{task.assignee}</span>
             </div>
-          )}
+          
 
 
           <div className={styles.menu}>
@@ -120,6 +120,7 @@ export default function Card({ task, isOpen, toggleDisclosure }) {
           </Text>
           <div className={styles.tooltip}>{task.title}</div>
         </div>
+
         <div className={styles.checklistsContainer}>
           <CheckLists
           isOpen={isOpen}

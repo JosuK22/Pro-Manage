@@ -7,6 +7,7 @@
   margin: .5rem 0px;
   box-shadow:var(--box-shadow);
   overflow: hidden;
+  position: relative;
 }
 
 .groupOne {
@@ -30,7 +31,7 @@
   font-size: 2rem;
 }
 
-.initial{
+.initial-container{
   width: 25px;
   height: 25px;
   background: #FFEBEB;
@@ -39,7 +40,7 @@
   justify-content: center;
   border-radius: 50%;
   text-transform: uppercase;
-  margin-left: -20px ;
+  margin-left: 90px ;
   cursor: pointer;
 }
 
@@ -147,6 +148,35 @@
   white-space: nowrap;
   opacity: 0;
   margin-bottom: 5px; 
+}
+.tooltip1{
+  background-color: #333;
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  top: 26%;
+  right: 10%;
+  color: #FFEBEB;
+  padding: .3rem .4rem;
+  border-radius: 6px;
+  z-index: 99;
+  white-space: nowrap;
+  
+}
+.initial-container:hover .tooltip1{
+  visibility: visible;
+  opacity: 1;
+}
+.tooltip1::before{
+  position: absolute;
+  content: "";
+  height: 0.6em;
+  width: 0.6em;
+  top: -0.2em;
+  left: 68%;
+  transform: translate(-50%) rotate(45deg);
+  background:#333;
+  
 }
 .tooltip::before {
   position: absolute;
