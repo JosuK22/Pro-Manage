@@ -2,88 +2,83 @@ import { useState } from 'react';
 import { CopyMinus, Plus } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import { Modal, Text } from '../../../../components/ui';
-import useModal from '../../../../hooks/useModal';
+import { Text, IconButton, EmptyState } from '../../../../components/ui';
 import Card from '../Card/Card';
-import TaskForm from '../TaskForm/TaskForm';
 
 import styles from './Container.module.css';
 
-export default function Container({ tasks, category }) {
-  const { isOpen: isCreateOpen, toggleModal: toggleCreateModal } = useModal();
+export default function Container({ tasks, category, onCreateTask }) {
   const [openDisclosures, setOpenDisclosures] = useState([]);
 
-  const closeDisclosure = (id) => {
-    setOpenDisclosures(
-      openDisclosures.filter((disclosure) => disclosure !== id)
+  const toggleDisclosure = (id) => {
+    setOpenDisclosures((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
     );
   };
 
-  const openDisclosure = (id) => {
-    const updatedDisclosures = [...openDisclosures, id];
-    setOpenDisclosures(updatedDisclosures);
-  };
-
-  const toggleDisclosure = (id) => {
-    if (openDisclosures.includes(id)) {
-      closeDisclosure(id);
-    } else {
-      openDisclosure(id);
-    }
-  };
-
-  const closeAllDisclosure = () => {
-    setOpenDisclosures([]);
-  };
+  const collapseAll = () => setOpenDisclosures([]);
 
   return (
-    <>
-      <div className={styles.container}>
-        <div className={styles.heading}>
-          <Text step={4} weight="500">
+    <section className={styles.container} aria-label={`${category.title} tasks`}>
+      <div className={styles.heading}>
+        <div className={styles.headingText}>
+          <Text as="h3" step={3} weight="600">
             {category.title}
           </Text>
-          <div className={styles.icons}>
-            {category.title == 'To do' && (
-              <Plus size={20} color="#767575" onClick={toggleCreateModal} />
-            )}
-            <CopyMinus
-              size={20}
-              color={openDisclosures.length ? '#17a2b8' : '#767575'}
-              onClick={closeAllDisclosure}
-              style={{ transform: 'scaleX(-1)' }} 
-            />
-          </div>
+          <span className={styles.count}>{tasks.length}</span>
         </div>
-        
-        <div className={styles.scroll}>
-          <div className={styles.tasks}>
-          
-            {tasks.map((task) => {
-              if (task.status == category.value) {
-                return (
-                  <Card
-                    key={task._id}
-                    task={task}
-                    isOpen={openDisclosures?.includes(task._id)}
-                    toggleDisclosure={() => toggleDisclosure(task._id)}
-                  />
-                );
-              }
-            })}
-          </div>
-       </div>
+
+        <div className={styles.icons}>
+          {category.value === 'todo' && (
+            // Was a bare clickable <svg> with no accessible name.
+            <IconButton label="Add a task to To do" size="sm" onClick={onCreateTask}>
+              <Plus size={18} />
+            </IconButton>
+          )}
+
+          <IconButton
+            label={`Collapse all checklists in ${category.title}`}
+            size="sm"
+            onClick={collapseAll}
+            disabled={openDisclosures.length === 0}
+            tone={openDisclosures.length ? 'primary' : 'default'}
+          >
+            <CopyMinus size={18} style={{ transform: 'scaleX(-1)' }} />
+          </IconButton>
+        </div>
       </div>
-      {isCreateOpen && (
-        <Modal toggleModal={toggleCreateModal}>
-          <TaskForm toggleModal={toggleCreateModal} />
-        </Modal>
-      )}
-    </>
+
+      <div className={styles.scroll}>
+        {tasks.length === 0 ? (
+          <EmptyState
+            compact
+            title="Nothing here"
+            description={
+              category.value === 'todo'
+                ? 'Add a task to get started.'
+                : `No tasks in ${category.title.toLowerCase()}.`
+            }
+          />
+        ) : (
+          <ul className={styles.tasks}>
+            {tasks.map((task) => (
+              <li key={task._id}>
+                <Card
+                  task={task}
+                  isOpen={openDisclosures.includes(task._id)}
+                  toggleDisclosure={() => toggleDisclosure(task._id)}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }
 
 Container.propTypes = {
-  tasks: PropTypes.array,
-  category: PropTypes.object,
+  tasks: PropTypes.array.isRequired,
+  category: PropTypes.object.isRequired,
+  onCreateTask: PropTypes.func.isRequired,
 };

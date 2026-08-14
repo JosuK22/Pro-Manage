@@ -1,98 +1,107 @@
-import React, { useState, useEffect, useContext } from 'react';
-import Select, { components } from 'react-select';
-import axios from 'axios'; 
-import { AuthContext } from '../../../store/AuthProvider';
-import { BACKEND_URL } from '../../../utils/connection';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import Select from 'react-select';
+
+import { assigneeApi } from '../../../services';
 
 import './styles.css';
 
-const SingleValue = ({ children, ...props }) => (
-  <components.SingleValue {...props}>
-    {props.data.label}
-  </components.SingleValue>
-);
-
-export default function Dropdown({ onChange, assignedValue }) {
-  const { user } = useContext(AuthContext);
-  const { token } = user;
+/**
+ * Assignee picker.
+ *
+ * Fetches the current user's board members and lets them be searched by email.
+ * Uses the shared API client — this component previously reached for axios,
+ * which meant the app shipped two HTTP stacks with two different auth and
+ * error conventions.
+ */
+export default function Dropdown({ id, onChange, assignedValue }) {
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const controller = new AbortController();
+
+    const fetchAssignees = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`${BACKEND_URL}/api/v1/assignees`, {
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        });
+        const res = await assigneeApi.list({ signal: controller.signal });
 
-        const { data } = response.data;
-        const emailArray = data.map((item) => item.email);
-
-        const formattedOptions = emailArray.map((email) => ({
-          value: email,
-          label: email,
-          customLabel: email.substring(0, 2),
-        }));
-
-        setOptions(formattedOptions);
-
-        if (assignedValue) {
-          const selected = formattedOptions.find(
-            (option) => option.value === assignedValue
-          );
-          setSelectedOption(selected);
-        }
-      } catch (error) {
-        console.error('Error fetching assignees:', error);
-        setOptions([]);
+        setOptions(
+          res.data.assignees.map((assignee) => ({
+            value: assignee.email,
+            label: assignee.email,
+            initials: assignee.email.substring(0, 2).toUpperCase(),
+          }))
+        );
+      } catch (err) {
+        if (err.name !== 'AbortError') setOptions([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, [token, assignedValue]);
+    fetchAssignees();
 
-  const handleOnChange = (selectedOption) => {
-    setSelectedOption(selectedOption);
-    onChange(selectedOption);
+    return () => controller.abort();
+    // Board members are per-user and change only via the "Add people" flow,
+    // so one fetch per mount is enough.
+  }, []);
+
+  // Derive the selection from the prop instead of mirroring it in state — the
+  // old copy could go stale when the form was reopened for a different task.
+  const selectedOption = assignedValue
+    ? options.find((option) => option.value === assignedValue) ?? {
+        // The assignee may no longer be on the board; still show what the task
+        // actually holds rather than silently blanking the field.
+        value: assignedValue,
+        label: assignedValue,
+        initials: assignedValue.substring(0, 2).toUpperCase(),
+      }
+    : null;
+
+  // react-select filters on the *string* returned here. Returning JSX (as the
+  // old code did) made every option stringify to "[object Object]", so typing
+  // matched nothing. Custom rendering belongs in formatOptionLabel.
+  const getOptionLabel = (option) => option.label;
+
+  const formatOptionLabel = (option, { context }) => {
+    if (context === 'value') return option.label;
+
+    return (
+      <div className="boardLists">
+        <div className="intialsContainer">
+          <span className="initials">{option.initials}</span>
+        </div>
+        <div className="emailContainer">
+          <span className="members">{option.label}</span>
+        </div>
+        <span className="assignButton">Assign</span>
+      </div>
+    );
   };
-
-  const getOptionLabel = (option) => (
-    <div className="boardLists">
-      <div className="intialsContainer">
-        <span className="initials">{option.customLabel}</span>
-      </div>
-      <div className="emailContainer">
-        <span className="members">{option.label}</span>
-      </div>
-      <button className="assignButton">Assign</button>
-    </div>
-  );
 
   return (
     <Select
+      inputId={id}
       options={options}
       value={selectedOption}
-      onChange={handleOnChange}
+      onChange={(option) => onChange(option)}
       placeholder="Add an assignee"
+      noOptionsMessage={() => 'No board members yet — add people to the board first'}
       isSearchable
       isClearable
-      styles={{
-        control: (baseStyles, state) => ({
-          ...baseStyles,
-          border: 'none',
-        }),
-      }}
       isLoading={isLoading}
       getOptionLabel={getOptionLabel}
-      components={{ SingleValue }}
+      formatOptionLabel={formatOptionLabel}
+      styles={{ control: (base) => ({ ...base, border: 'none' }) }}
       className="react-select-container"
       classNamePrefix="react-select"
     />
   );
 }
+
+Dropdown.propTypes = {
+  id: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  assignedValue: PropTypes.string,
+};

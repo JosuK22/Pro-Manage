@@ -1,156 +1,202 @@
-.container {
-  position: relative;
+/* Fields stack vertically at every width — the old form had a 700px minimum
+   that overflowed any phone. */
+.form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  min-height: 596px;
-  min-width: 700px;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
-.input {
+.field {
   display: flex;
   flex-direction: column;
-  gap: 0.325rem;
-  font-family: Inter;
-  
+  gap: var(--space-2);
+  min-width: 0;
 }
-.input2 {
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  font-family: Inter;
+
+.field > label,
+.field > :global(label) {
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
-.input input{
+
+.field input[type='text'] {
   width: 100%;
-  border: 2px solid var(--neutral);
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
+  padding: var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
 }
-.input2 input{
-  width: 85%;
-  border: 2px solid var(--neutral);
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  margin-left: 1.4rem;
-} 
-.input input:focus {
+
+.field input[type='text']:focus-visible {
   outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
 }
-.label{
-  width: 15%;
+
+.required {
+  color: var(--error);
 }
-.dropdown{
-  width: 85%;
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--error);
 }
-.radioGroup {
-  flex: 1;
+
+/* --- Priority ------------------------------------------------------------- */
+/* Wraps to as many rows as it needs instead of forcing one line. */
+.priorities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.priorityOption {
+  flex: 1 1 9rem;
+  min-width: 0;
+}
+
+.priority {
   display: flex;
   align-items: center;
   justify-content: center;
-  justify-content: space-between;
-}
+  gap: var(--space-2);
 
-.radioOptions {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  flex: 1;
-}
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
 
-.radioOption {
-  padding: 0.5rem;
-  border: 2px solid var(--neutral);
-  border-radius: 0.5rem;
-  font-size: 0.5rem;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
   cursor: pointer;
-  outline: none;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
-.checkedOption {
-  background-color: var(--neutral);
+.priorityChecked {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-active);
+  font-weight: 600;
 }
 
-.radioOption p {
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  flex: none;
+}
+
+/* --- Checklist ------------------------------------------------------------ */
+.checklists {
   display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  flex-direction: column;
+  gap: var(--space-3);
+  border: none;
+  min-width: 0;
 }
 
-.radioOption > p span {
-  font-size: 2rem;
+.checklists legend {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: var(--space-2);
 }
-
-.buttonGroup {
-  display: flex;
-}
-
-.actions {
-  display: flex;
-  flex: 1;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-
 
 .lists {
-  max-height: 19vh;
-  min-height: 19vh;
-  overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: var(--space-2);
+  max-height: 14rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
 }
 
 .list {
   display: flex;
-  gap: 1rem;
-  max-width: 95%;
-  margin-top: 0.5rem;
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--neutral);
-  border-radius: 0.75rem;
   align-items: center;
-  
-}
+  gap: var(--space-2);
+  min-width: 0;
 
-.list input[type='text'] {
-  flex: 1;
-  border: none;
-  font-size: 1rem;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 
 .list input[type='checkbox'] {
   width: 1rem;
   height: 1rem;
+  flex: none;
   accent-color: var(--primary);
 }
 
-.list input[type='text']:focus,
-.list input[type='text']:active {
-  outline: none;
-}
-
-.list button {
-  background-color: transparent;
+.list input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2);
   border: none;
-  color: red;
-  display: flex;
+  font-size: var(--text-sm);
+  background: transparent;
 }
 
-.addButton {
-  margin-top: 0.5rem;
+.list input[type='text']:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-radius: var(--radius-sm);
 }
 
-.datePickerContainer{
-  position: absolute;
-  top: 30%;
-  right: 35%;
+/* --- Actions -------------------------------------------------------------- */
+.actions {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.dueDateGroup {
+  position: relative;
+}
+
+.datePicker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   align-items: center;
-  justify-content: center;
+
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 
+.submitGroup {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-2);
+}
+
+@media (min-width: 480px) {
+  .actions {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .submitGroup {
+    flex-direction: row;
+  }
+
+  /* The picker floats above the layout on wider screens so it doesn't push
+     the action row down. */
+  .datePicker {
+    position: absolute;
+    bottom: calc(100% + var(--space-2));
+    left: 0;
+    margin-top: 0;
+    z-index: var(--z-dropdown);
+  }
+}

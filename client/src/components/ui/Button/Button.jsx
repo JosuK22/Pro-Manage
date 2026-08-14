@@ -6,11 +6,23 @@ export default function Button({
   color = 'primary',
   variant,
   onClick,
+  // Defaults to "button": a bare <button> inside a <form> submits it, which
+  // caused stray submits from unrelated controls (e.g. the checklist trash
+  // icon). Callers that really are the submit control opt in explicitly.
+  type = 'button',
+  disabled = false,
+  className = '',
+  ...rest
 }) {
   return (
     <button
+      type={type}
       onClick={onClick}
-      className={`${styles[color]} ${styles[variant]} ${styles.button}`}
+      disabled={disabled}
+      className={[styles[color], styles[variant], styles.button, className]
+        .filter(Boolean)
+        .join(' ')}
+      {...rest}
     >
       {children}
     </button>
@@ -18,9 +30,11 @@ export default function Button({
 }
 
 Button.propTypes = {
-  children: PropTypes.string,
-  toggle: PropTypes.func,
+  children: PropTypes.node,
   color: PropTypes.oneOf(['primary', 'error', 'success', 'neutral']),
-  variant: PropTypes.oneOf(['outline','jumbo', 'ghost']),
+  variant: PropTypes.oneOf(['outline', 'jumbo', 'ghost']),
   onClick: PropTypes.func,
+  type: PropTypes.oneOf(['button', 'submit', 'reset']),
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
 };

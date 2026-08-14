@@ -1,57 +1,109 @@
 .container {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  padding: var(--space-4);
 }
 
 .backdrop {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.792);
-  z-index: 0;
-  animation: fadeIn 200ms ease-in;
+  background: rgb(16 24 40 / 45%);
+  backdrop-filter: blur(2px);
 }
 
 .content {
-  /* min-height: 596px; */
-  background-color: rgb(255, 255, 255);
-  border-radius: 1rem;
-  padding: 1rem 1.5rem;
   position: relative;
-  z-index: 10;
-  width: 95%;
-  animation: scaleIn 200ms ease-in-out;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
-  
-  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+
+  /* Responsive sizing: never wider than the viewport, never taller than it.
+     `dvh` accounts for mobile browser chrome that `vh` ignores. */
+  width: 100%;
+  max-height: calc(100dvh - var(--space-6));
+  overflow: hidden;
 }
 
-@media screen and (min-width: 768px) {
-  .content {
-    max-width: fit-content;
-  }
+.sm {
+  max-width: min(24rem, calc(100vw - var(--space-6)));
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.md {
+  max-width: min(34rem, calc(100vw - var(--space-6)));
 }
 
-@keyframes scaleIn {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
+.lg {
+  max-width: min(46rem, calc(100vw - var(--space-6)));
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.close:hover {
+  background: var(--neutral);
+  color: var(--text);
+}
+
+/* The body scrolls; the header stays put. */
+.body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* On phones a dialog reads better as a bottom sheet: it is anchored to the
+   thumb, and the keyboard pushes it rather than covering a centred box. */
+@media (max-width: 639px) {
+  .container {
+    align-items: flex-end;
+    padding: 0;
   }
-  to {
-    transform: scale(1);
-    opacity: 1;
+
+  .content,
+  .sm,
+  .md,
+  .lg {
+    max-width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .body {
+    padding: var(--space-4);
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
   }
 }

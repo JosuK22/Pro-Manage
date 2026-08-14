@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './astronut.module.css';
 
 const Astronaut = () => (

@@ -1,36 +1,63 @@
+/* Mobile-first: the form fills the screen. The poster is a progressive
+   enhancement that appears once there is room for it. */
 .container {
   display: flex;
+  min-height: 100dvh;
 }
 
 .poster {
-  background-color: var(--primary);
-  flex: 3;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: none;
 }
 
-.image {
-  margin-bottom: 2rem;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  z-index: 1; 
-}
-.circle{
-  position: absolute;
-  width: 300px; 
-  height: 300px;
-  border-radius: 50%;
-  background: #317F8B;
-  z-index: -1;
-}
 .outlet {
-  height: 100vh;
-  flex: 2;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--space-5) var(--space-4);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .poster {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    text-align: center;
+    background-color: var(--primary);
+  }
+
+  .outlet {
+    flex: 2;
+    padding: var(--space-6);
+    background: var(--surface);
+  }
+
+  .image {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+    z-index: 1;
+  }
+
+  .image img {
+    max-width: 18rem;
+    height: auto;
+  }
+
+  .circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(300px, 60%);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #317f8b;
+    z-index: -1;
+  }
 }

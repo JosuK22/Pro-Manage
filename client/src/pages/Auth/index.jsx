@@ -1,66 +1,22 @@
+import { useContext, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Outlet, useNavigate } from 'react-router-dom';
+
 import astroBoy from '../../assets/astronut.png';
-import { Text } from '../../components/ui';
-import { useContext, useEffect, useState } from 'react'; 
+import { Text, OfflineBanner } from '../../components/ui';
 import { AuthContext } from '../../store/AuthProvider';
 
 import styles from './index.module.css';
 
 export default function AuthLayout() {
-  const { user } = useContext(AuthContext);
+  const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth); 
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      navigate('/');
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
     }
-  }, [user, navigate]);
-
-  if (windowWidth < 800) {
-    return (
-      <>
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            style: {
-              background: '#fff',
-              color: 'black',
-            },
-          }}
-        />
-
-        <main className={styles.container}>
-          <div className={styles.poster}>
-          <div className={styles.image}>
-            <div className={styles.circle}></div>
-            <img src={astroBoy} alt="Astro boy" />
-          </div>
-            <Text color="white" step={8}>
-              Sorry amigo ☹️
-            </Text>
-            <Text color="white" step={4} style={{ marginTop: '0.5rem' }}>
-              This website is for desktop only
-            </Text>
-          </div>
-        </main>
-      </>
-    );
-  }
+  }, [isAuthenticated, navigate]);
 
   return (
     <>
@@ -69,32 +25,42 @@ export default function AuthLayout() {
         reverseOrder={false}
         toastOptions={{
           style: {
-            background: '#fff',
-            color: 'black',
+            background: 'var(--surface)',
+            color: 'var(--text)',
+            boxShadow: 'var(--shadow-lg)',
           },
         }}
       />
 
+      {/*
+        The previous version measured window.innerWidth and, below 800px,
+        replaced the entire app with "Sorry amigo — this website is for desktop
+        only". Phones are the most likely device for a link like this, so the
+        poster is now decorative: it is hidden on small screens while the form
+        itself stays fully usable at 320px.
+      */}
       <main className={styles.container}>
-        <div className={styles.poster}>
+        <aside className={styles.poster} aria-hidden="true">
           <div className={styles.image}>
-            <div className={styles.circle}></div>
-            <img src={astroBoy} alt="Astro boy" />
+            <div className={styles.circle} />
+            <img src={astroBoy} alt="" />
           </div>
 
-          <Text color="white" step={8}>
+          <Text as="p" color="white" step={8}>
             Welcome aboard my friend
           </Text>
 
-          <Text color="white" step={4} style={{ marginTop: '0.5rem' }}>
+          <Text as="p" color="white" step={4} style={{ marginTop: '0.5rem' }}>
             Just a couple of clicks and we start
           </Text>
-        </div>
+        </aside>
 
         <div className={styles.outlet}>
           <Outlet />
         </div>
       </main>
+
+      <OfflineBanner />
     </>
   );
 }

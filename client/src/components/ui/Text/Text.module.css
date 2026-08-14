@@ -1,57 +1,42 @@
 .text {
-  max-width: 65ch;
+  line-height: var(--leading-normal);
+  /* Long emails and titles wrap instead of overflowing their container. */
+  overflow-wrap: break-word;
 }
 
+/* Fluid steps — see index.css for the underlying clamp() scale. */
 .stepOne {
-  font-size: 12px;
-  letter-spacing: 0.0025em;
-  line-height: 16px;
+  font-size: var(--text-xs);
 }
 
 .stepTwo {
-  font-size: 14px;
-  letter-spacing: 0em;
-  line-height: 20px;
+  font-size: var(--text-sm);
 }
 
 .stepThree {
-  font-size: 16px;
-  letter-spacing: 0em;
-  line-height: 24px;
+  font-size: var(--text-base);
 }
 
 .stepFour {
-  font-size: 18px;
-  letter-spacing: -0.0025em;
-  line-height: 26px;
+  font-size: var(--text-lg);
 }
 
 .stepFive {
-  font-size: 20px;
-  letter-spacing: -0.005em;
-  line-height: 27.24px;
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
 }
 
 .stepSix {
-  font-size: 24px;
-  letter-spacing: -0.00625em;
-  line-height: 30px;
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
 }
 
 .stepSeven {
-  font-size: 28px;
-  letter-spacing: -0.0075em;
-  line-height: 36px;
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
 }
 
 .stepEight {
-  font-size: 35px;
-  letter-spacing: -0.01em;
-  line-height: 40px;
+  font-size: clamp(1.875rem, 1.5rem + 1.9vw, 2.75rem);
+  line-height: var(--leading-tight);
 }
-
-
-
-/* font-family: Poppins, Inter, Noto-Sans;
-  line-height: 1.5;
-  font-weight: 400; */

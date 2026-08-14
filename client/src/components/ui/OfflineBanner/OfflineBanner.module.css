@@ -1,0 +1,31 @@
+.banner {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-4);
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  width: max-content;
+  max-width: calc(100vw - var(--space-6));
+  padding: var(--space-2) var(--space-4);
+
+  background: var(--warning-soft);
+  color: var(--warning);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+@media (max-width: 639px) {
+  .banner {
+    border-radius: var(--radius-md);
+    bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  }
+}

@@ -1,19 +1,57 @@
 .badge {
-  background-color: #eeecec;
-  color: #767575;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.325rem;
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
 
-  max-width: fit-content;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.error {
-  background-color: #cf3636;
-  color: white;
+.default {
+  background: var(--neutral);
+  color: var(--text-muted);
+}
+
+.primary {
+  background: var(--primary-soft);
+  color: var(--primary-active);
 }
 
 .success {
-  background-color: #63c05b;
-  color: white;
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.error {
+  background: var(--error-soft);
+  color: var(--error);
+}
+
+.warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.interactive {
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.interactive:hover:not(:disabled) {
+  background: var(--primary-soft);
+  color: var(--primary-active);
+  border-color: var(--primary);
+}
+
+.interactive:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

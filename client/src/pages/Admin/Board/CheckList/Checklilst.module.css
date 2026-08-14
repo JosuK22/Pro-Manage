@@ -1,15 +1,31 @@
 .container {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.7rem 0.8rem;
-  border: 1px solid #e2e2e2;
-  border-radius: 15px;
-  margin: 1rem 1rem 1rem 0px;
+  align-items: flex-start;
+  gap: var(--space-3);
+
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 0;
 }
+
 .container input[type='checkbox'] {
   width: 1rem;
   height: 1rem;
+  margin-top: 0.2rem;
+  flex: none;
   accent-color: var(--primary);
-  overflow: hidden;
+  cursor: pointer;
+}
+
+.container input[type='checkbox']:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.label {
+  font-size: var(--text-sm);
+  min-width: 0;
+  overflow-wrap: break-word;
+  cursor: pointer;
 }

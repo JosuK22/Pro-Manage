@@ -1,72 +1,105 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  height: 100%;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
-.groupOne,
-.groupTwo {
+/* --- Board bar ------------------------------------------------------------ */
+.boardBar {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  
-  height: 50px;
+  gap: var(--space-3);
 }
 
-.groupTwo {
-  margin-top: 1rem;
-  position: relative;
-  z-index: 10;
-  align-items: center;
-}
-
- .subgroup{
-  width: 60%;
+.boardTitleRow {
   display: flex;
-  height: 100%;
-  justify-content: left;
-  align-items: center;
- }
+  align-items: baseline;
+  gap: var(--space-3);
+}
 
- .subgroup input{
+.boardActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* On the narrowest screens the two actions stack to full width rather than
+   squeezing side by side. */
+@media (max-width: 479px) {
+  .boardActions {
+    width: 100%;
+  }
+
+  .boardActions > * {
+    flex: 1 1 100%;
+  }
+}
+
+/* --- Filters -------------------------------------------------------------- */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: 0 var(--space-2) 0 var(--space-3);
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.searchField:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.searchIcon {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.searchField input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) 0;
+  border: none;
+  background: transparent;
+  font-size: var(--text-sm);
+}
+
+.searchField input:focus {
   outline: none;
- }
+}
 
- .icon {
-  width: 150px;
-  height: 100%;
+.selects {
   display: flex;
-  align-items: center;
-  justify-content: left;
-  opacity: 0.6;
-  border-radius: 5px;
-  background-color: var(--neutral);
-  border-radius: 0.5rem;
-  box-shadow: var(--box-shadow);
+  gap: var(--space-2);
+  flex: 0 1 auto;
+}
+
+.selectField select {
+  height: 100%;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text);
   cursor: pointer;
-  transition: box-shadow 0.3s ease;
 }
 
-.icon:hover {
-  box-shadow: none; 
-}
-.addusers{
-  width: 20%;
-  margin-left: .5rem;
-}
-.addemail{
-  width: 75%;
-  margin-left: 4%;
-  
-}
-
-.board{
-  width: 150px;
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  height: 100%;
-}
+/* --- Date range listbox --------------------------------------------------- */
 .listbox {
   position: relative;
 }
@@ -74,103 +107,111 @@
 .listboxButton {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  font-size: 1rem;
-  background-color: transparent;
-  border: none;
-  font-family: inherit;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.listboxButton:hover {
+  border-color: var(--border-strong);
+}
+
+.rotate {
+  transform: rotate(180deg);
+  transition: transform var(--transition-fast);
 }
 
 .listboxOptions {
   position: absolute;
-  list-style-type: none;
   right: 0;
-  box-shadow: 0 25.6px 57.6px 0 rgb(0 0 0 / 22%),
-    0 4.8px 14.4px 0 rgb(0 0 0 / 18%);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background-color: white;
-}
+  top: calc(100% + var(--space-1));
+  z-index: var(--z-dropdown);
 
-.active {
-  background-color: #4391ed10;
-}
+  min-width: 11rem;
+  padding: var(--space-1);
+  list-style: none;
 
-.selected {
-  background-color: var(--neutral);
-  color: rgb(0, 0, 0);
-  box-shadow: 0 20px 10px -20px rgba(0, 0, 0, 0.45) inset;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 
 .listboxOption {
-  
-  width: 120px;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
   cursor: pointer;
-  margin: 0.5rem;
-  border-radius: 0.325rem;
-  position: relative;
-  z-index: 40;
 }
 
-.checkIcon {
-  width: 2rem;
+.optionActive {
+  background: var(--surface-sunken);
 }
 
-.rotate {
-  transform: rotateX(180deg);
-}
-.addModal, .successModal{
-  width: 500px;
-  padding-top: 1rem;
+.optionSelected {
+  background: var(--primary-soft);
+  color: var(--primary-active);
+  font-weight: 600;
 }
 
-.successModal{
+/* --- Modals --------------------------------------------------------------- */
+.modalBody {
   display: flex;
-  height: 235px;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
 }
-.modalButtons{
+
+.field {
   display: flex;
-  justify-content: center;
-  gap: 2%;
-  margin-top: 10px;
-  
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
-.input {
-  display: flex;
-  align-items: center;
-  border: 2px solid #d0d0d0;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  margin-top: 20px;
+.field label {
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 
-.input input {
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  flex: 1;
+.field input {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
 }
 
-.input input:focus {
+.field input:focus-visible {
   outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
-.errorContainer{
-  height: 30px;
-  width: 80%;
-  margin-left: 25px;
-  margin-top: 10px;
+.fieldError {
+  font-size: var(--text-sm);
   color: var(--error);
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-2);
+}
+
+@media (min-width: 480px) {
+  .modalActions {
+    flex-direction: row;
+  }
+
+  .modalActions > * {
+    flex: 1;
+    min-width: 0;
+  }
 }

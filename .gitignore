@@ -1,6 +1,16 @@
 node_modules
 *.config
+
+# Environment files — never commit real secrets.
+# `.env.example` files are intentionally tracked.
+.env
+.env.*
 *.env
+!.env.example
+!**/.env.example
+
+# Test / coverage output
+coverage
 
 # Logs
 logs

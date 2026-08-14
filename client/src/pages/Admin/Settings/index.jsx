@@ -3,24 +3,35 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import * as yup from 'yup';
 import FormInput from '../../../components/form/InputBar/FormInput';
-import { Button, Text } from '../../../components/ui';
-import { useContext, useEffect, useState } from 'react';
-import { Eye, User, Lock, Mail, EyeOff } from 'lucide-react';
+import { Button, PageHeader } from '../../../components/ui';
+import { useContext, useState } from 'react';
+import { User, Lock, Mail } from 'lucide-react';
 import { AuthContext } from '../../../store/AuthProvider';
-import { BACKEND_URL } from '../../../utils/connection';
+import { userApi } from '../../../services';
+import { EMAIL_REGEX, MIN_PASSWORD_LENGTH } from '../../../constants/task';
 import styles from './index.module.css';
 
 const schema = yup
   .object({
-    name: yup.string(),
-    email: yup.string(),
-    newPassword: yup.string(),
+    name: yup.string().trim().required('Name cannot be empty'),
+    email: yup
+      .string()
+      .trim()
+      .required('Email cannot be empty')
+      .matches(EMAIL_REGEX, { message: 'Email is not valid' }),
     oldPassword: yup.string(),
+    // Validated only when the user is actually setting a new password.
+    newPassword: yup
+      .string()
+      .test(
+        'min-length-when-set',
+        `Use at least ${MIN_PASSWORD_LENGTH} characters`,
+        (value) => !value || value.length >= MIN_PASSWORD_LENGTH
+      ),
   })
   .required();
 
 export default function Settings() {
-  const [isSafeToReset, setIsSafeToReset] = useState(false);
   const { user, updateInfo, logout } = useContext(AuthContext);
   const [isModified, setIsModified] = useState(false);
 
@@ -45,101 +56,120 @@ export default function Settings() {
       }
   
       const isEmailChanged = data.email !== user.info.email;
-      const isPasswordChanged = data.oldPassword && data.newPassword;
-  
-      const res = await fetch(BACKEND_URL + '/api/v1/users', {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + user.token,
-        },
+      const isPasswordChanged = Boolean(data.oldPassword && data.newPassword);
+
+      // Only send what the user actually intends to change: posting empty
+      // password fields would otherwise look like a password change attempt.
+      await userApi.updateProfile({
+        name: data.name,
+        email: data.email,
+        ...(isPasswordChanged
+          ? { oldPassword: data.oldPassword, newPassword: data.newPassword }
+          : {}),
       });
-  
-      if (!res.ok) {
-        const errJson = await res.json();
-        const { errors } = errJson;
-  
-        for (const property in errors) {
-          setError(property, { type: 'custom', message: errors[property] });
-        }
-  
-        throw new Error(errJson.message);
-      }
-  
-      setIsSafeToReset(true);
-      await updateInfo(isEmailChanged || isPasswordChanged); 
-  
-      setIsModified(false); 
-  
-      if (isSafeToReset) {
+
+      // Changing the email or the password invalidates the identity the
+      // current session was issued for, so the user must sign in again.
+      //
+      // The previous code called `setIsSafeToReset(true)` and then read
+      // `isSafeToReset` in the same render — state updates are not applied
+      // synchronously, so the value was still `false` and `logout()` never
+      // ran. The decision is a plain local variable now; no state involved.
+      const mustReauthenticate = Boolean(isEmailChanged || isPasswordChanged);
+
+      if (mustReauthenticate) {
+        toast.success('Details updated. Please log in again.');
         logout();
+        return;
       }
+
+      await updateInfo();
+      reset({ ...data, oldPassword: '', newPassword: '' });
+      setIsModified(false);
+      toast.success('Details updated');
     } catch (error) {
-      toast.error(error.message);
-      console.log(error.message);
+      Object.entries(error.errors || {}).forEach(([field, message]) => {
+        setError(field, { type: 'server', message });
+      });
+
+      if (!error.isSessionExpired) toast.error(error.message);
     }
   };
-  
-  
-  
-  
 
-
-  useEffect(() => {
-    if (!isSafeToReset) return;
-  
-    reset(defaultValues);
-    setIsSafeToReset(false); 
-  }, [reset, isSafeToReset]);
-  
 
   return (
     <div className={styles.container}>
-      <Text step={5} weight="500">
-        Settings
-      </Text>
+      <PageHeader
+        title="Settings"
+        description="Manage your profile and sign-in details."
+      />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <FormInput
-          error={errors.name}
-          label="name"
-          register={register}
-          placeholder={'Name'}
-          onChange={() => setIsModified(true)}
-          mainIcon={<User />}
-        />
-        <FormInput
-          error={errors.email}
-          label="email"
-          register={register}
-          placeholder={'Email'}
-          onChange={() => setIsModified(true)}
-          mainIcon={<Mail />}
-        />
-        <FormInput
-          error={errors.oldPassword}
-          label="oldPassword"
-          register={register}
-          placeholder={'Old Password'}
-          secondaryIcon={<EyeOff/>}
-          tertiaryIcon ={<Eye/>}
-          mainIcon={<Lock />}
-          type="password"
-        />
-        <FormInput
-          error={errors.newPassword}
-          label="newPassword"
-          register={register}
-          placeholder={'New Password'}
-          mainIcon={<Lock />}
-          secondaryIcon={<EyeOff />}
-          tertiaryIcon ={<Eye/>}
-          onChange={() => setIsModified(true)}
-          type="password"
-        />
+      <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
+        {/* Grouped into Profile and Security so the destructive, session-ending
+            fields are visibly separate from an ordinary name change. */}
+        <fieldset className={styles.section}>
+          <legend className={styles.legend}>Profile</legend>
 
-        <Button>{isSubmitting ? 'Updating...' : 'Update'}</Button>
+          <FormInput
+            error={errors.name}
+            label="name"
+            fieldLabel="Name"
+            register={register}
+            placeholder="Your name"
+            onChange={() => setIsModified(true)}
+            mainIcon={<User />}
+          />
+          <FormInput
+            error={errors.email}
+            label="email"
+            fieldLabel="Email address"
+            register={register}
+            placeholder="you@example.com"
+            onChange={() => setIsModified(true)}
+            mainIcon={<Mail />}
+          />
+        </fieldset>
+
+        <fieldset className={styles.section}>
+          <legend className={styles.legend}>Security</legend>
+          <p className={styles.hint}>
+            Leave these blank to keep your current password.
+          </p>
+
+          <FormInput
+            error={errors.oldPassword}
+            label="oldPassword"
+            fieldLabel="Current password"
+            register={register}
+            placeholder="Current password"
+            onChange={() => setIsModified(true)}
+            mainIcon={<Lock />}
+            type="password"
+          />
+          <FormInput
+            error={errors.newPassword}
+            label="newPassword"
+            fieldLabel="New password"
+            register={register}
+            placeholder="New password"
+            onChange={() => setIsModified(true)}
+            mainIcon={<Lock />}
+            type="password"
+          />
+        </fieldset>
+
+        {/* Changing an email or password invalidates the session, so say so
+            before the user submits rather than surprising them with a logout. */}
+        <p className={styles.notice} role="status">
+          Changing your email address or password will sign you out on this
+          device, and you’ll need to log in again.
+        </p>
+
+        <div className={styles.actions}>
+          <Button type="submit" disabled={isSubmitting || !isModified}>
+            {isSubmitting ? 'Saving…' : 'Save changes'}
+          </Button>
+        </div>
       </form>
 
     </div>

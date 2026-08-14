@@ -1,0 +1,44 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: 50%;
+  background: #ffebeb;
+  color: #4a4a4a;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.6875rem;
+}
+
+.md {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 0.8125rem;
+}
+
+.lg {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1rem;
+}
+
+/* Visually distinct from a real assignee so "nobody" never reads as "someone". */
+.unassigned {
+  background: #f1f3f5;
+  color: #8c959d;
+  border: 1px dashed #ccd3d9;
+}
+
+.icon {
+  width: 60%;
+  height: 60%;
+}

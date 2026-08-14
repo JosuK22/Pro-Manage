@@ -1,28 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import * as yup from 'yup';
-import { EyeOff, LockKeyhole, Mail, User, Eye } from 'lucide-react';
+import { LockKeyhole, Mail, User } from 'lucide-react';
 
-import { BACKEND_URL } from '../../../utils/connection';
+import { AuthContext } from '../../../store/AuthProvider';
+import { authApi } from '../../../services';
 import FormInput from '../../../components/form/InputBar/FormInput';
-import {Button} from '../../../components/ui';
+import { Button } from '../../../components/ui';
 import Form from '../Form/Form';
+import { EMAIL_REGEX, MIN_PASSWORD_LENGTH } from '../../../constants/task';
 
 import styles from './styles.module.css';
 
-
-const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const message = '* This field is required';
 
 const schema = yup
   .object({
-    
     name: yup.string().required(message),
-    email: yup.string().required(message).matches(emailRegex, { message: 'Email is not valid' }),
-    password: yup.string().required(message),
-    confirmPassword: yup.string().required(message).oneOf([yup.ref('password')], 'Passwords do not match'),
+    email: yup
+      .string()
+      .required(message)
+      .matches(EMAIL_REGEX, { message: 'Email is not valid' }),
+    // Mirrors the server's policy so the user is told before the round-trip.
+    password: yup
+      .string()
+      .required(message)
+      .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`),
+    confirmPassword: yup
+      .string()
+      .required(message)
+      .oneOf([yup.ref('password')], 'Passwords do not match'),
   })
   .required();
 
@@ -34,14 +44,12 @@ const defaultValues = {
 };
 
 export default function Register() {
-  const [isSafeToReset, setIsSafeToReset] = useState(false);
-
-  
+  const authCtx = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
-    reset,
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -52,43 +60,25 @@ export default function Register() {
   const onSubmit = async (data) => {
    
     try {
-      const res = await fetch(
-        BACKEND_URL + '/api/v1/auth/register',
-        {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // The API returns { info, token } on registration, so the user is signed
+      // in immediately instead of being bounced back to the login form.
+      const resJson = await authApi.register(data);
+      authCtx.login(resJson.data);
 
-      if (!res.ok) {
-        const errJson = await res.json();
-        console.log(errJson);
-        const { errors } = errJson;
+      toast.success('Welcome to Pro Manage!');
 
-        for (const property in errors) {
-          setError(property, { type: 'custom', message: errors[property] });
-        }
-
-        throw new Error(errJson.message);
-      }
-
-      toast.success('Successfully registered!');
-      setIsSafeToReset(true);
+      // No reset() here: this component unmounts on navigation, and resetting
+      // a form that is about to disappear was what the old `isSafeToReset`
+      // effect was working around.
+      navigate('/', { replace: true });
     } catch (error) {
+      Object.entries(error.errors || {}).forEach(([field, message]) => {
+        setError(field, { type: 'server', message });
+      });
+
       toast.error(error.message);
-      console.log(error.message);
     }
   };
-  
-
-  useEffect(() => {
-    if (!isSafeToReset) return;
-
-    reset(defaultValues); 
-  }, [reset, isSafeToReset]);
 
   return (
     <Form title="Register">
@@ -114,8 +104,6 @@ export default function Register() {
           type="password"
           placeholder={'Password'}
           mainIcon={<LockKeyhole />}
-          secondaryIcon={<Eye/>}
-          tertiaryIcon ={<EyeOff/>}
         />
         <FormInput
           error={errors.confirmPassword}
@@ -124,11 +112,11 @@ export default function Register() {
           type="password"
           placeholder={'Confirm Password'}
           mainIcon={<LockKeyhole />}
-          secondaryIcon={<Eye/>}
-          tertiaryIcon ={<EyeOff/>}
         />
 
-        <Button>{isSubmitting ? 'Registering...' : 'Register'}</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Registering...' : 'Register'}
+        </Button>
       </form>
     </Form>
   );

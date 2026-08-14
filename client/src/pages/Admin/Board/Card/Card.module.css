@@ -1,231 +1,181 @@
 .container {
-  background-color: var(--main-color);
-  padding: 1rem ;
-  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  /* No fixed width or height anywhere: the card sizes to its column and to
+     its content, so long titles, missing assignees and long checklists all
+     render without clipping or overlap. */
   width: 100%;
-  border-radius: 20px;
-  margin: .5rem 0px;
-  box-shadow:var(--box-shadow);
-  overflow: hidden;
-  position: relative;
+  min-width: 0;
+  padding: var(--space-4);
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
-.groupOne {
+.container:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+}
+
+.topRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
-.moderate {
-  color: #18b0ff;
-  font-size: 2rem;
-}
-
-.low {
-  color: #63c05b;
-  font-size: 2rem;
-}
-
-.high {
-  color: #ff2473;
-  font-size: 2rem;
-}
-
-.initial-container{
-  width: 25px;
-  height: 25px;
-  background: #FFEBEB;
+.topRowEnd {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  text-transform: uppercase;
-  margin-left: 90px ;
-  cursor: pointer;
+  /* Replaces the old `margin-left: 90px` on the avatar, which pushed it off
+     the card at narrow widths. */
+  gap: var(--space-1);
+  flex: none;
 }
 
-.badges {
-  margin-top: 2.2rem;
+.priority {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  flex: none;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+
+  /* Two lines, then ellipsis — long titles never blow out the card. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.footer {
   display: flex;
-  justify-content: space-evenly;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
 }
 
-.categoryBadges {
+.statusBadges {
   display: flex;
-  flex: 1;
-  gap: 0.5rem;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-left: auto;
 }
 
+/* --- Actions menu --------------------------------------------------------- */
 .menu {
   position: relative;
-  z-index: 5;
 }
 
 .menuButton {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  background-color: transparent;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+
   border: none;
-  font-family: inherit;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
   cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.menuButton:hover {
+  background: var(--neutral);
+  color: var(--text);
 }
 
 .menuItems {
   position: absolute;
-  list-style-type: none;
   right: 0;
-  box-shadow: var(--box-shadow);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background-color: var(--main-color);
+  top: calc(100% + var(--space-1));
+  z-index: var(--z-dropdown);
+
+  min-width: 9rem;
+  padding: var(--space-1);
+  list-style: none;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 
 .menuItem {
-  width: 120px;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--text);
   cursor: pointer;
-  margin: 0.5rem;
-  border-radius: 0.25rem;
 }
 
-.active {
-  background-color: #4391ed10;
+.menuItemActive {
+  background: var(--surface-sunken);
 }
 
-.selected {
-  background-color: var(--primary);
-  color: var(--main-color);
-  box-shadow: 0 20px 10px -20px rgba(0, 0, 0, 0.45) inset;
+.menuItemDanger {
+  color: var(--error);
 }
 
-.error {
-  color: red;
+.menuItemDanger.menuItemActive {
+  background: var(--error-soft);
 }
 
-.error:hover {
-  background-color: #ff0b0b10;
-}
-.deletecontent{
-  padding: .2rem 2rem;
-}
-.deleteActions {
-  margin-top: 1.5rem;
+/* --- Delete dialog -------------------------------------------------------- */
+.dialogBody {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-5);
 }
 
-.card-title-container {
-  position: relative;
-  display: inline-block;
-  width: 60%; 
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
-  margin-top: 1rem; 
-  margin-bottom: 1.8rem;
+.dialogActions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-2);
 }
 
-.tooltip {
-  visibility: hidden;
-  background-color: #333;
-  color: var(--main-color);
-  text-align: center;
-  border-radius: 4px;
-  padding: 4px 8px;
-  position: absolute;
-  z-index: 10;
-  left: 70%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  opacity: 0;
-  margin-bottom: 5px; 
-}
-.tooltip1{
-  background-color: #333;
-  position: absolute;
-  visibility: hidden;
-  opacity: 0;
-  top: 26%;
-  right: 10%;
-  color: #FFEBEB;
-  padding: .3rem .4rem;
-  border-radius: 6px;
-  z-index: 99;
-  white-space: nowrap;
-  
-}
-.initial-container:hover .tooltip1{
-  visibility: visible;
-  opacity: 1;
-}
-.tooltip1::before{
-  position: absolute;
-  content: "";
-  height: 0.6em;
-  width: 0.6em;
-  top: -0.2em;
-  left: 68%;
-  transform: translate(-50%) rotate(45deg);
-  background:#333;
-  
-}
-.tooltip::before {
-  position: absolute;
-  content: "";
-  height: 0.6em;
-  width: 0.6em;
-  bottom: -0.2em;
-  left: 30%;
-  transform: translate(-50%) rotate(45deg);
-  background:#333;
-}
-
-.card-title-container:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-  animation: rise 0.3s ease-in-out both;
-}
-
-.text-truncate {
-  display: block;
-  max-width: 150px; 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@keyframes rise {
-  0% {
-    
-    bottom: 30%;
+@media (min-width: 480px) {
+  .dialogActions {
+    flex-direction: row;
   }
 
-  25% {
-    
-    bottom: 60%;
-  }
-
-  50% {
-    
-    bottom: 80%;
-  }
-
-  75% {
-    
-    bottom: 90%;
-  }
-
-  100% {
-    
-    bottom: 110%;
+  .dialogActions > * {
+    flex: 1;
+    min-width: 0;
   }
 }

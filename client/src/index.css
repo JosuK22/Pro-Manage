@@ -1,24 +1,122 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+/* ===========================================================================
+   Pro-Manage design tokens
+   ---------------------------------------------------------------------------
+   One source of truth for colour, spacing, radius, elevation, typography,
+   motion, breakpoints and layering. Components reference these variables
+   instead of repeating literal values, which is what let the old stylesheets
+   drift into a dozen different greys and five different card radii.
+   =========================================================================== */
 
 :root {
-  font-family: Poppins, Inter, Noto-Sans;
-  line-height: 1.5;
-  font-weight: 400;
-
+  /* --- Brand ------------------------------------------------------------ */
   --primary: #17a2b8;
+  --primary-hover: #148fa3;
+  --primary-active: #117d8e;
+  --primary-soft: #e7f6f8;
   --primary-focus: #1baec5;
-  --error: red;
-  --error-focus: rgb(236, 2, 2);
-  --neutral: #eef2f5;
-  --main-color : #fff;
 
-  --box-shadow: 0 3.2px 7.2px 0 rgb(0 0 0 / 13%), 0 0.6px 1.8px 0 rgb(0 0 0 / 11%);
+  /* --- Priority (kept from the original identity) ----------------------- */
+  --priority-high: #e01a5f; /* darkened from #ff2473 to reach AA on white */
+  --priority-moderate: #0d84c9; /* darkened from #18b0ff to reach AA on white */
+  --priority-low: #3f8f38; /* darkened from #63c05b to reach AA on white */
+
+  /* --- Feedback --------------------------------------------------------- */
+  --error: #d32f2f;
+  --error-hover: #b52626;
+  --error-soft: #fdecec;
+  --success: #2e7d32;
+  --success-soft: #eaf4ea;
+  --warning: #b26a00;
+  --warning-soft: #fdf3e3;
+
+  /* --- Surfaces & text -------------------------------------------------- */
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f4f7f9;
+  --page-bg: #f4f7f9;
+  --neutral: #eef2f5;
+  --main-color: #ffffff; /* retained: referenced by existing modules */
+
+  --border: #e2e8ec;
+  --border-strong: #ccd6dd;
+
+  --text: #1f2933;
+  --text-muted: #5b6b78; /* 5.4:1 on white — the old #767575/opacity:0.4 was not AA */
+  --text-subtle: #7b8794;
+  --text-inverse: #ffffff;
+
+  /* --- Spacing (4px base) ----------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* --- Radius ----------------------------------------------------------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  /* --- Elevation -------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
+  --shadow-md: 0 2px 4px -2px rgb(16 24 40 / 6%), 0 4px 8px -2px rgb(16 24 40 / 10%);
+  --shadow-lg: 0 4px 6px -2px rgb(16 24 40 / 4%), 0 12px 16px -4px rgb(16 24 40 / 10%);
+  --box-shadow: var(--shadow-md); /* retained: referenced by existing modules */
+
+  /* --- Typography ------------------------------------------------------- */
+  --font-sans: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Fluid scale: readable at 320px, comfortable at 1440px+. */
+  --text-xs: clamp(0.6875rem, 0.66rem + 0.14vw, 0.75rem);
+  --text-sm: clamp(0.8125rem, 0.79rem + 0.11vw, 0.875rem);
+  --text-base: clamp(0.875rem, 0.85rem + 0.13vw, 1rem);
+  --text-lg: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-xl: clamp(1.125rem, 1.07rem + 0.27vw, 1.375rem);
+  --text-2xl: clamp(1.375rem, 1.28rem + 0.45vw, 1.75rem);
+  --text-3xl: clamp(1.625rem, 1.45rem + 0.9vw, 2.25rem);
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  /* --- Motion ----------------------------------------------------------- */
+  --transition-fast: 120ms ease;
+  --transition: 200ms ease;
+
+  /* --- Layering --------------------------------------------------------- */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-drawer: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* --- Layout ----------------------------------------------------------- */
+  --sidebar-width: 250px;
+  --header-height: 3.5rem;
+
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  font-weight: 400;
+  color: var(--text);
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Breakpoints used across the app (documented here; CSS cannot use variables
+   inside media queries):
+     mobile        < 640px
+     tablet        640px – 1023px
+     desktop       1024px – 1279px
+     large desktop >= 1280px                                                 */
 
 * {
   box-sizing: border-box;
@@ -26,23 +124,86 @@
   margin: 0;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--text);
+  font-size: var(--text-base);
+  /* Long titles and emails must wrap rather than force the page sideways. */
+  overflow-wrap: break-word;
+}
+
 a {
   text-decoration: none;
   color: inherit;
 }
 
+img,
+svg {
+  max-width: 100%;
+}
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* --- Focus -----------------------------------------------------------------
+   Outlines are never removed globally. `:focus-visible` shows a ring for
+   keyboard users without adding one on mouse clicks.                        */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- Reduced motion ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- Screen-reader-only helper ------------------------------------------- */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: inherit;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(156, 183, 197);
-  border-radius: 10px;
+  background-color: var(--border-strong);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-subtle);
 }

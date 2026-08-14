@@ -1,21 +1,24 @@
-import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
-import toast from 'react-hot-toast';
 import { useImmer } from 'use-immer';
 
 import { AuthContext } from './AuthProvider';
-import { BACKEND_URL } from '../utils/connection';
-
-const options = [
-  { id: 1, name: 'Today', value: 1 },
-  { id: 2, name: 'This week', value: 7 },
-  { id: 3, name: 'This month', value: 30 },
-];
+import { taskApi } from '../services';
+import { DEFAULT_DATE_RANGE } from '../constants/task';
 
 export const TasksContext = createContext({
-  tasks: [],
+  tasks: null,
   isLoading: false,
-  selectedDateRange: { id: 2, name: 'This week', value: 7 },
+  error: null,
+  selectedDateRange: DEFAULT_DATE_RANGE,
   setSelectedDateRange: () => {},
   fetchTasks: async () => {},
   minorTaskUpdate: async () => {},
@@ -24,239 +27,197 @@ export const TasksContext = createContext({
   deleteTask: async () => {},
 });
 
+/** Strip client-only checklist bookkeeping before sending a task to the API. */
+const toApiPayload = (task) => ({
+  title: task.title,
+  priority: task.priority,
+  status: task.status,
+  dueDate: task.dueDate ?? null,
+  assignee: task.assignee || null,
+  checklists: (task.checklists ?? []).map((list) => ({
+    title: list.title,
+    checked: Boolean(list.checked),
+  })),
+});
+
 export default function TaskProvider({ children }) {
   const [tasks, setTasks] = useImmer(null);
-  const [selectedDateRange, setSelectedDateRange] = useState(options[1]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useContext(AuthContext);
-  const { token } = user;
-  const { value } = selectedDateRange;
+  const [selectedDateRange, setSelectedDateRange] = useState(DEFAULT_DATE_RANGE);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const fetchTasks = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch(
-        BACKEND_URL + '/api/v1/tasks?range=' + value,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
+  const { isAuthenticated } = useContext(AuthContext);
+  const { value: range } = selectedDateRange;
+
+  // Lets a mutation snapshot the current list without taking a dependency on
+  // `tasks`, which would rebuild every callback on each keystroke of state.
+  const tasksRef = useRef(null);
+  tasksRef.current = tasks;
+
+  const fetchTasks = useCallback(
+    async ({ signal } = {}) => {
+      if (!isAuthenticated) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const res = await taskApi.list({ range, signal });
+        setTasks(res.data.tasks);
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+
+        // A dead session is already being handled centrally (one toast, one
+        // redirect); surfacing a board-level error on top would be noise.
+        if (!err.isSessionExpired) {
+          setError(err);
         }
-      );
-
-      if (!res.ok) {
-        const errObj = await res.json();
-        console.log(errObj);
-        throw new Error(errObj.message);
-      }
-
-      const dataObj = await res.json();
-      setTasks(dataObj.data.tasks);
-    } catch (error) {
-      toast.error(error.message);
-    }
-    setIsLoading(false);
-  }, [token, setTasks, value]);
-
-  useEffect(() => {
-    (async () => {
-      fetchTasks();
-    })();
-  }, [fetchTasks]);
-
-
-  const minorDbUpdate = useCallback(
-    async (task, updates) => {
-      const res = await fetch(
-        BACKEND_URL + '/api/v1/tasks/' + task._id,
-        {
-          method: 'PATCH',
-          body: JSON.stringify(updates),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        const errObj = await res.json();
-        console.log(errObj);
-        throw new Error(errObj.message);
+      } finally {
+        setIsLoading(false);
       }
     },
-    [token]
+    [isAuthenticated, range, setTasks]
   );
 
-  const minorStateUpdate = useCallback(
-    (task, updates) => {
-      setTasks((draft) => {
-        let tsk = draft.find((t) => t._id == task._id);
+  useEffect(() => {
+    const controller = new AbortController();
 
-        if (!tsk) return;
+    fetchTasks({ signal: controller.signal });
 
-        const updateKeys = Object.keys(updates);
-        updateKeys.map((updateKey) => (tsk[updateKey] = updates[updateKey]));
-      });
+    // Cancels an in-flight board load when the range changes again quickly, so
+    // a slow earlier response cannot overwrite a newer one.
+    return () => controller.abort();
+  }, [fetchTasks]);
+
+  /**
+   * Apply an optimistic change, then reconcile with the server.
+   *
+   * The previous implementation mutated local state and fired the request
+   * without ever restoring the old value, so a rejected update stayed on
+   * screen until a manual refresh — the UI showed a state the server had
+   * refused.
+   */
+  const withOptimisticUpdate = useCallback(
+    async (applyLocally, sendToServer) => {
+      const previous = tasksRef.current;
+
+      setTasks(applyLocally);
+
+      try {
+        return await sendToServer();
+      } catch (err) {
+        // Restore the exact pre-change list.
+        setTasks(previous);
+        throw err;
+      }
     },
     [setTasks]
   );
 
+  /** Small in-place edits: status change, checklist tick. */
   const minorTaskUpdate = useCallback(
-    async (task, updates) => {
-      minorStateUpdate(task, updates);
-      await minorDbUpdate(task, updates);
-    },
-    [minorStateUpdate, minorDbUpdate]
+    async (task, updates) =>
+      withOptimisticUpdate(
+        (draft) => {
+          if (!draft) return;
+          const target = draft.find((item) => item._id === task._id);
+          if (!target) return;
+
+          Object.entries(updates).forEach(([key, value]) => {
+            target[key] = value;
+          });
+        },
+        async () => {
+          const res = await taskApi.update(task._id, updates);
+
+          // Adopt the server's version so derived fields the server owns
+          // (completedAt, isExpired, assignedTo) are correct locally too.
+          setTasks((draft) => {
+            if (!draft) return;
+            const index = draft.findIndex((item) => item._id === task._id);
+            if (index >= 0) draft[index] = res.data.task;
+          });
+        }
+      ),
+    [withOptimisticUpdate, setTasks]
   );
 
-  const majorDbUpdate = useCallback(
-    async (taskId, updates) => {
-      const copyTask = JSON.parse(JSON.stringify(updates));
-      copyTask.checklists.forEach((list) => {
-        if (list.isNew) {
-          delete list._id;
-          delete list.isNew;
-        }
-      });
-
-      const res = await fetch(
-        BACKEND_URL+ '/api/v1/tasks/' + taskId,
-        {
-          method: 'PATCH',
-          body: JSON.stringify(copyTask),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        const errObj = await res.json();
-        throw new Error(errObj.message);
-      }
-
-      const resObj = await res.json();
-      return resObj.data.task;
-    },
-    [token]
-  );
-
+  /**
+   * Full task edits from the form.
+   *
+   * Not optimistic: the server normalises the checklist (assigning real ids)
+   * and resolves the assignee, so rendering a guess would flash the wrong
+   * content. The form shows its own submitting state instead.
+   */
   const majorTaskUpdate = useCallback(
     async (taskId, updates) => {
-      const updatedTask = await majorDbUpdate(taskId, updates);
+      const res = await taskApi.update(taskId, toApiPayload(updates));
+
       setTasks((draft) => {
-        let index = draft.findIndex((task) => task._id === taskId);
-        if (index < 0) return;
-        draft[index] = updatedTask;
+        if (!draft) return;
+        const index = draft.findIndex((task) => task._id === taskId);
+        if (index >= 0) draft[index] = res.data.task;
       });
+
+      return res.data.task;
     },
-    [majorDbUpdate, setTasks]
-  );
-
-  const addTaskToDb = useCallback(
-    async (task) => {
-      
-      const copyTask = JSON.parse(JSON.stringify(task));
-      copyTask.checklists.forEach((list) => {
-        delete list._id;
-        delete list.isNew;
-      });
-
-      const res = await fetch(BACKEND_URL + '/api/v1/tasks/', {
-        method: 'POST',
-        body: JSON.stringify(copyTask),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token,
-        },
-      });
-
-      if (!res.ok) {
-        const errObj = await res.json();
-        throw new Error(errObj.message);
-      }
-
-      const resObj = await res.json();
-      return resObj.data.task;
-    },
-    [token]
+    [setTasks]
   );
 
   const addTask = useCallback(
     async (task) => {
-      const newTask = await addTaskToDb(task);
+      const res = await taskApi.create(toApiPayload(task));
 
       setTasks((draft) => {
-        draft.push(newTask);
+        // Newest first, matching the server's sort.
+        if (draft) draft.unshift(res.data.task);
+        else return [res.data.task];
       });
+
+      return res.data.task;
     },
-    [setTasks, addTaskToDb]
-  );
-
-
-  const deleteTaskFromDb = useCallback(
-    async (taskId) => {
-      const res = await fetch(
-        BACKEND_URL + '/api/v1/tasks/' + taskId,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        const errObj = await res.json();
-        throw new Error(errObj.message);
-      }
-    },
-    [token]
+    [setTasks]
   );
 
   const deleteTask = useCallback(
-    async (taskId) => {
-      await deleteTaskFromDb(taskId);
-
-      setTasks((draft) => {
-        return draft.filter((task) => task._id !== taskId);
-      });
-    },
-    [deleteTaskFromDb, setTasks]
+    async (taskId) =>
+      withOptimisticUpdate(
+        (draft) => {
+          if (!draft) return;
+          return draft.filter((task) => task._id !== taskId);
+        },
+        () => taskApi.remove(taskId)
+      ),
+    [withOptimisticUpdate]
   );
 
-  return (
-    <TasksContext.Provider
-      value={useMemo(() => {
-        return {
-          tasks,
-          isLoading,
-          minorTaskUpdate,
-          fetchTasks,
-          addTask,
-          majorTaskUpdate,
-          deleteTask,
-          selectedDateRange,
-          setSelectedDateRange,
-        };
-      }, [
-        tasks,
-        isLoading,
-        deleteTask,
-        minorTaskUpdate,
-        fetchTasks,
-        addTask,
-        majorTaskUpdate,
-        selectedDateRange,
-        setSelectedDateRange,
-      ])}
-    >
-      {children}
-    </TasksContext.Provider>
+  const value = useMemo(
+    () => ({
+      tasks,
+      isLoading,
+      error,
+      selectedDateRange,
+      setSelectedDateRange,
+      fetchTasks,
+      minorTaskUpdate,
+      majorTaskUpdate,
+      addTask,
+      deleteTask,
+    }),
+    [
+      tasks,
+      isLoading,
+      error,
+      selectedDateRange,
+      fetchTasks,
+      minorTaskUpdate,
+      majorTaskUpdate,
+      addTask,
+      deleteTask,
+    ]
   );
+
+  return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;
 }
 
 TaskProvider.propTypes = {

@@ -2,47 +2,43 @@ const Assignee = require('../model/assigneeModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 
-
 exports.getAssignees = catchAsync(async (req, res, next) => {
-  const assignees = await Assignee.find({ createdBy: req.user._id });
+  const assignees = await Assignee.find({ createdBy: req.user._id }).sort({ email: 1 });
 
   res.status(200).json({
     status: 'success',
     results: assignees.length,
-    data: assignees,
+    data: { assignees },
   });
 });
-
 
 exports.createAssignee = catchAsync(async (req, res, next) => {
   const { email } = req.body;
-  const createdBy = req.user._id;
 
-  const existingAssignee = await Assignee.findOne({ email });
+  // The old implementation first looked the email up globally, which meant an
+  // email already used on *someone else's* board took a pointless extra query.
+  // Uniqueness is now enforced by a compound index, so a duplicate surfaces as
+  // a 409 from the global error handler rather than a check that two
+  // concurrent requests could both pass.
+  const existing = await Assignee.findOne({ email, createdBy: req.user._id });
 
-  if (existingAssignee) {
-    
-    const assigneeForUser = await Assignee.findOne({ email, createdBy });
-
-    if (assigneeForUser) {
-      throw new AppError('* This member is already in the board', 400);
-    }
+  if (existing) {
+    throw new AppError('This member is already on your board.', 409);
   }
 
-  
-  const newAssignee = new Assignee({ email, createdBy });
-  const savedAssignee = await newAssignee.save();
+  const assignee = await Assignee.create({ email, createdBy: req.user._id });
 
   res.status(201).json({
     status: 'success',
-    data: savedAssignee,
+    data: { assignee },
   });
 });
 
-
 exports.getAssignee = catchAsync(async (req, res, next) => {
-  const { assigneeId } = req.params;
-  const assignee = await Assignee.findOne({ _id: assigneeId, createdBy: req.user._id });
+  const assignee = await Assignee.findOne({
+    _id: req.params.assigneeId,
+    createdBy: req.user._id,
+  });
 
   if (!assignee) {
     throw new AppError('Assignee not found', 404);
@@ -50,23 +46,18 @@ exports.getAssignee = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: assignee,
+    data: { assignee },
   });
 });
-
 
 exports.updateAssignee = catchAsync(async (req, res, next) => {
   const { assigneeId } = req.params;
   const { email } = req.body;
 
-  const existingAssignee = await Assignee.findOne({ email, createdBy: req.user._id });
-  if (existingAssignee) {
-    throw new AppError('* You have already added this assignee', 400);
-  }
-
-  
   const updatedAssignee = await Assignee.findOneAndUpdate(
     { _id: assigneeId, createdBy: req.user._id },
+    // Explicit single field — `createdBy` is immutable and the body is never
+    // spread into the update.
     { email },
     { new: true, runValidators: true }
   );
@@ -77,16 +68,13 @@ exports.updateAssignee = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: updatedAssignee,
+    data: { assignee: updatedAssignee },
   });
 });
 
-
 exports.deleteAssignee = catchAsync(async (req, res, next) => {
-  const { assigneeId } = req.params;
-
   const deletedAssignee = await Assignee.findOneAndDelete({
-    _id: assigneeId,
+    _id: req.params.assigneeId,
     createdBy: req.user._id,
   });
 
@@ -94,8 +82,5 @@ exports.deleteAssignee = catchAsync(async (req, res, next) => {
     throw new AppError('Assignee not found', 404);
   }
 
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
+  res.status(204).send();
 });

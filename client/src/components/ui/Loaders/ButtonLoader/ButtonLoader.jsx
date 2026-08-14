@@ -1,5 +1,4 @@
 // LineLoader.jsx
-import React from 'react';
 import { LineWave } from 'react-loader-spinner';
 import styles from './buttonloader.module.css';
 

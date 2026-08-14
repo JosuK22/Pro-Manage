@@ -1,17 +1,130 @@
-.container {
+/* ---------------------------------------------------------------------------
+   App shell
+   Mobile  : top app bar + slide-in navigation drawer
+   >=1024px: persistent sidebar, no top bar
+   `dvh` rather than `vh` so mobile browser chrome doesn't clip the layout.
+   --------------------------------------------------------------------------- */
+
+.shell {
+  min-height: 100dvh;
   display: flex;
-  height: 100vh;
+  flex-direction: column;
+  background: var(--page-bg);
 }
 
-.navigation {
-  width: 250px;
-  border-right: 2px solid #edf5fe;
-  height: 100%;
+.bootstrap {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
 }
 
-.outlet {
-  overflow: hidden;
+/* --- Mobile top bar ------------------------------------------------------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--header-height);
+  padding: 0 var(--space-3);
+
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbarBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.topbarLogo {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  background: rgb(16 24 40 / 45%);
+}
+
+/* --- Navigation drawer ---------------------------------------------------- */
+.sidebar {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: calc(var(--z-drawer) + 1);
+
+  width: min(17rem, 82vw);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+
+  transform: translateX(-100%);
+  transition: transform var(--transition);
+  overflow-y: auto;
+}
+
+.sidebarOpen {
+  transform: translateX(0);
+}
+
+.content {
   flex: 1;
-  /* background-color: aqua; */
-  padding: 1.5rem 1.5rem .5rem 1.5rem;
+  min-width: 0;
+}
+
+.contentInner {
+  padding: var(--space-4);
+  /* Keeps line lengths sane on ultra-wide displays. */
+  max-width: 100rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .contentInner {
+    padding: var(--space-5);
+  }
+}
+
+/* --- Desktop: persistent sidebar ------------------------------------------ */
+@media (min-width: 1024px) {
+  .shell {
+    flex-direction: row;
+  }
+
+  .topbar,
+  .backdrop {
+    display: none;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    width: var(--sidebar-width);
+    flex: none;
+    transform: none;
+    transition: none;
+  }
+
+  .content {
+    /* Without this a wide board would stretch the flex item instead of
+       scrolling inside its own column. */
+    min-width: 0;
+  }
+
+  .contentInner {
+    padding: var(--space-6);
+  }
 }

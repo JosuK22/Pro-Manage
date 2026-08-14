@@ -1,17 +1,50 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--text-muted);
 }
 
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
+
   border: none;
-  display: flex;
-  padding: 0.25rem;
-  border-radius: 0.5rem;
-  box-shadow: var(--box-shadow);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.button:hover {
+  background: var(--neutral);
+  color: var(--text);
 }
 
 .rotate {
   transform: rotate(180deg);
+  transition: transform var(--transition-fast);
+}
+
+.lists {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  list-style: none;
+  max-height: 12rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }

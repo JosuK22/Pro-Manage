@@ -1,0 +1,55 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+/* Comfortable touch targets — 44px on mobile per WCAG 2.2 target size. */
+.sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.md {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+@media (pointer: coarse) {
+  .sm,
+  .md {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+.button:hover:not(:disabled) {
+  background: var(--neutral);
+  color: var(--text);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.danger {
+  color: var(--error);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--error-soft);
+  color: var(--error-hover);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
