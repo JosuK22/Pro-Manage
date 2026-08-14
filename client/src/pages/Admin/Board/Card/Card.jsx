@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { Menu } from '@headlessui/react';
-import { MoreHorizontal } from 'lucide-react';
+import { useDraggable } from '@dnd-kit/core';
+import { GripVertical, MoreHorizontal } from 'lucide-react';
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 
@@ -23,6 +24,17 @@ export default function Card({ task, isOpen, toggleDisclosure }) {
 
   const priority =
     TASK_PRIORITIES.find((item) => item.value === task.priority) ?? TASK_PRIORITIES[2];
+
+  /**
+   * Drag-and-drop is an *enhancement*: the status badges below remain the
+   * primary, always-available way to move a task. Only the grip handle carries
+   * the drag listeners, so clicking the menu, the checklist or a badge is never
+   * swallowed by a drag gesture.
+   */
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } = useDraggable({
+    id: task._id,
+    data: { task },
+  });
 
   // `deleteTask` is async: without `await`, the try/catch could never observe a
   // rejection, so a failed delete still closed the modal and claimed success.
@@ -57,7 +69,10 @@ export default function Card({ task, isOpen, toggleDisclosure }) {
 
   return (
     <>
-      <article className={styles.container}>
+      <article
+        ref={setNodeRef}
+        className={`${styles.container} ${isDragging ? styles.dragging : ''}`}
+      >
         <div className={styles.topRow}>
           <Text as="span" step={1} weight="500" className={styles.priority}>
             {/* The colour dot alone would encode priority by colour only; the
@@ -71,6 +86,19 @@ export default function Card({ task, isOpen, toggleDisclosure }) {
           </Text>
 
           <div className={styles.topRowEnd}>
+            {/* dnd-kit's `attributes` add the aria-describedby that tells screen
+                reader users how to pick the card up with the keyboard. */}
+            <button
+              type="button"
+              ref={setActivatorNodeRef}
+              className={styles.dragHandle}
+              aria-label={`Move “${task.title}”`}
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical size={16} aria-hidden="true" />
+            </button>
+
             <Avatar email={task.assignee} size="sm" />
 
             <Menu as="div" className={styles.menu}>

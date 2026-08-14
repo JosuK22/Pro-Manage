@@ -98,3 +98,28 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* The card that follows the pointer/keyboard focus while dragging. Deliberately
+   a compact chip rather than a full card clone: it stays readable at any column
+   width and does not re-run the checklist/menu rendering on every frame. */
+.dragPreview {
+  max-width: 20rem;
+  padding: var(--space-3) var(--space-4);
+
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  cursor: grabbing;
+
+  /* Long titles must not stretch the preview across the board. */
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

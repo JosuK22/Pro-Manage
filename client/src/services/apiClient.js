@@ -43,6 +43,13 @@ let onUnauthorized = () => {};
 export function configureApiClient(handlers = {}) {
   if (handlers.getToken) getToken = handlers.getToken;
   if (handlers.onUnauthorized) onUnauthorized = handlers.onUnauthorized;
+
+  // Installing handlers starts a fresh session context, so any in-progress
+  // expiry from the previous one is no longer relevant. Without this the guard
+  // below could still be latched from a prior session and swallow the next
+  // expiry entirely. AuthProvider registers once per mount, so this never runs
+  // in the middle of a 401 burst.
+  isHandlingUnauthorized = false;
 }
 
 /**

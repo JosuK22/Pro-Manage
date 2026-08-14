@@ -1,8 +1,19 @@
-import { useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import toast from 'react-hot-toast';
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 
 import { TasksContext } from '../../../../store/TaskProvider';
-import { TASK_STATUSES } from '../../../../constants/task';
+import { TASK_STATUSES, STATUS_TITLES } from '../../../../constants/task';
 import Container from '../CardsContainer/Container';
 import { Button, ColumnSkeleton, EmptyState, ErrorState } from '../../../../components/ui';
 
@@ -14,8 +25,53 @@ export default function TasksContainer({
   onClearFilters,
   onCreateTask,
 }) {
-  const { isLoading, error, fetchTasks } = useContext(TasksContext);
+  const { isLoading, error, fetchTasks, minorTaskUpdate } = useContext(TasksContext);
   const [activeStatus, setActiveStatus] = useState(TASK_STATUSES[1].value);
+  const [draggedTask, setDraggedTask] = useState(null);
+
+  /**
+   * Mouse needs a small distance threshold and touch a short delay, otherwise
+   * the sensors swallow ordinary clicks and vertical scrolling inside a column.
+   * The keyboard sensor is what makes dragging usable without a pointer.
+   */
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 6 } }),
+    useSensor(KeyboardSensor)
+  );
+
+  const handleDragEnd = useCallback(
+    ({ active, over }) => {
+      setDraggedTask(null);
+
+      const task = active?.data?.current?.task;
+      // Dropped outside a column, or back where it started.
+      if (!task || !over || task.status === over.id) return;
+
+      // Optimistic in the provider, which rolls the board back if this rejects;
+      // the card must never sit in a column the server refused.
+      minorTaskUpdate(task, { status: over.id }).catch((err) => {
+        if (!err.isSessionExpired) toast.error(err.message || 'Could not move this task.');
+      });
+    },
+    [minorTaskUpdate]
+  );
+
+  /** Spoken feedback for keyboard/screen-reader dragging. */
+  const announcements = useMemo(
+    () => ({
+      onDragStart: ({ active }) =>
+        `Picked up ${active.data.current?.task?.title ?? 'task'}.`,
+      onDragOver: ({ over }) =>
+        over ? `Over ${STATUS_TITLES[over.id]}.` : 'Not over a column.',
+      onDragEnd: ({ active, over }) =>
+        over
+          ? `Moved ${active.data.current?.task?.title ?? 'task'} to ${STATUS_TITLES[over.id]}.`
+          : 'Move cancelled.',
+      onDragCancel: () => 'Move cancelled.',
+    }),
+    []
+  );
 
   /**
    * Group once, not once per column.
@@ -103,27 +159,46 @@ export default function TasksContainer({
         ))}
       </div>
 
-      <div className={styles.columns}>
-        {TASK_STATUSES.map((status) => (
-          <div
-            key={status.value}
-            id={`panel-${status.value}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${status.value}`}
-            // Only the selected column is shown on mobile; CSS reveals all four
-            // from 640px up, where `hidden` is overridden.
-            className={`${styles.column} ${
-              activeStatus === status.value ? styles.columnActive : ''
-            }`}
-          >
-            <Container
-              tasks={grouped[status.value]}
-              category={status}
-              onCreateTask={onCreateTask}
-            />
-          </div>
-        ))}
-      </div>
+      {/* Drag-and-drop layers on top of the existing board; the per-card status
+          badges are untouched and remain the accessible fallback. */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        accessibility={{ announcements }}
+        onDragStart={({ active }) => setDraggedTask(active.data.current?.task ?? null)}
+        onDragCancel={() => setDraggedTask(null)}
+        onDragEnd={handleDragEnd}
+      >
+        <div className={styles.columns}>
+          {TASK_STATUSES.map((status) => (
+            <div
+              key={status.value}
+              id={`panel-${status.value}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${status.value}`}
+              // Only the selected column is shown on mobile; CSS reveals all four
+              // from 640px up, where `hidden` is overridden.
+              className={`${styles.column} ${
+                activeStatus === status.value ? styles.columnActive : ''
+              }`}
+            >
+              <Container
+                tasks={grouped[status.value]}
+                category={status}
+                onCreateTask={onCreateTask}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* A lightweight preview follows the cursor, so the real card can stay
+            in place as a dimmed placeholder instead of jumping out of the list. */}
+        <DragOverlay dropAnimation={null}>
+          {draggedTask && (
+            <div className={styles.dragPreview}>{draggedTask.title}</div>
+          )}
+        </DragOverlay>
+      </DndContext>
     </>
   );
 }

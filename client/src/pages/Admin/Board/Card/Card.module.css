@@ -22,6 +22,48 @@
   border-color: var(--border-strong);
 }
 
+/* The card being dragged stays in place as a dimmed placeholder; the moving
+   copy is the DragOverlay rendered by TasksContainer. */
+.dragging {
+  opacity: 0.4;
+}
+
+.dragHandle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: grab;
+
+  /* Stops the browser from claiming the gesture as a scroll/text selection
+     before dnd-kit's sensors see it. */
+  touch-action: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.dragHandle:hover {
+  background: var(--neutral);
+  color: var(--text);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+/* Below the tablet breakpoint only one column is visible at a time, so there
+   is nowhere to drag to — the status badges are the way to move a task there.
+   Showing a grip that cannot do anything would be a false affordance. */
+@media (min-width: 640px) {
+  .dragHandle {
+    display: inline-flex;
+  }
+}
+
 .topRow {
   display: flex;
   align-items: center;

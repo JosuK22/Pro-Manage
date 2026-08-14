@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import { CopyMinus, Plus } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -18,8 +19,16 @@ export default function Container({ tasks, category, onCreateTask }) {
 
   const collapseAll = () => setOpenDisclosures([]);
 
+  // The whole column is the drop target — including its header — so a card
+  // dropped anywhere over the column lands in it.
+  const { setNodeRef, isOver } = useDroppable({ id: category.value });
+
   return (
-    <section className={styles.container} aria-label={`${category.title} tasks`}>
+    <section
+      ref={setNodeRef}
+      className={`${styles.container} ${isOver ? styles.isOver : ''}`}
+      aria-label={`${category.title} tasks`}
+    >
       <div className={styles.heading}>
         <div className={styles.headingText}>
           <Text as="h3" step={3} weight="600">

@@ -10,6 +10,14 @@
   gap: var(--space-3);
 }
 
+/* An explicit drop target: a dashed outline plus a tint, so the destination is
+   obvious and is not signalled by colour alone. */
+.isOver {
+  border-style: dashed;
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
 .heading {
   display: flex;
   align-items: center;

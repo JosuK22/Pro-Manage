@@ -48,10 +48,16 @@ function Harness() {
         ))}
       </ul>
 
-      <button type="button" onClick={() => minorTaskUpdate(task(), { status: 'done' })}>
+      {/* The provider rethrows so real callers (Card, Checklists) can show an
+          error; this harness only asserts on the rolled-back state, so it
+          swallows the rejection rather than leaving it unhandled. */}
+      <button
+        type="button"
+        onClick={() => minorTaskUpdate(task(), { status: 'done' }).catch(() => {})}
+      >
         Move to done
       </button>
-      <button type="button" onClick={() => deleteTask('t1')}>
+      <button type="button" onClick={() => deleteTask('t1').catch(() => {})}>
         Delete
       </button>
     </div>
