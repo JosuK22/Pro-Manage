@@ -174,7 +174,7 @@ export default function Card({ task, isOpen, toggleDisclosure }) {
               <Badge
                 key={status.value}
                 onClick={() => handleStatusChange(status.value)}
-                label={`Move "${task.title}" to ${status.title}`}
+                label={`Move “${task.title}” to ${status.title}`}
               >
                 {status.title}
               </Badge>

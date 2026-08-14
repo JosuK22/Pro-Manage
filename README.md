@@ -29,7 +29,9 @@ small analytics dashboard.
 
 **Board**
 - Four-column Kanban: Backlog, To do, In progress, Done
-- Move a task between columns from the card itself
+- Drag a card between columns (mouse, touch or keyboard), or move it from the
+  card's own status buttons — the buttons are always available, so the feature
+  never depends on a drag gesture
 - Client-side search across title, assignee and priority
 - Priority and date-range filters, with a clear-filters action
 - Per-column task counts and collapse-all for checklists
@@ -227,7 +229,9 @@ registration and login, credential-leak regressions, JWT handling, ownership
 date-range behaviour, and analytics correctness.
 
 Frontend tests cover the API client's error and session handling, the
-optimistic-update rollback path, and rendering of unassigned tasks.
+optimistic-update rollback path, rendering of unassigned tasks, modal focus
+management, and the board's drag-and-drop layer — including the guarantee that
+the status buttons remain a working, keyboard-accessible fallback.
 
 ---
 
