@@ -1,43 +1,69 @@
-import { useEffect, useState } from 'react';
-import { WifiOff } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Wifi, WifiOff } from 'lucide-react';
+
+import useOnlineStatus from '../../../hooks/useOnlineStatus';
 
 import styles from './OfflineBanner.module.css';
+
+/** How long the "connection restored" confirmation stays before it retires. */
+const RESTORED_MS = 3200;
 
 /**
  * Persistent, unobtrusive notice while the browser reports no connection.
  *
  * Shown as a banner rather than a toast because the condition lasts until it
- * is fixed — a toast would disappear while the problem is still there. It
- * removes itself automatically when the connection returns.
+ * is fixed — a toast would disappear while the problem is still there.
+ *
+ * Reconnecting now shows a brief confirmation rather than the banner simply
+ * vanishing: silently disappearing leaves the user unsure whether the app
+ * recovered or they just stopped noticing the warning.
  */
 export default function OfflineBanner() {
-  const [isOffline, setIsOffline] = useState(
-    typeof navigator !== 'undefined' && navigator.onLine === false
-  );
+  const isOnline = useOnlineStatus();
+  const [showRestored, setShowRestored] = useState(false);
+  const wasOffline = useRef(false);
 
   useEffect(() => {
-    const goOffline = () => setIsOffline(true);
-    const goOnline = () => setIsOffline(false);
+    if (!isOnline) {
+      wasOffline.current = true;
+      setShowRestored(false);
+      return undefined;
+    }
 
-    window.addEventListener('offline', goOffline);
-    window.addEventListener('online', goOnline);
+    // Only confirm a recovery if there was an outage to recover from.
+    if (!wasOffline.current) return undefined;
 
-    return () => {
-      window.removeEventListener('offline', goOffline);
-      window.removeEventListener('online', goOnline);
-    };
-  }, []);
+    wasOffline.current = false;
+    setShowRestored(true);
 
-  if (!isOffline) return null;
+    const timer = setTimeout(() => setShowRestored(false), RESTORED_MS);
+    return () => clearTimeout(timer);
+  }, [isOnline]);
+
+  if (isOnline && !showRestored) return null;
+
+  const restored = isOnline;
 
   return (
     // `polite` so it is announced without interrupting whatever the user is doing.
-    <div className={styles.banner} role="status" aria-live="polite">
-      <WifiOff size={16} aria-hidden="true" />
-      <span>
-        <strong>You’re offline.</strong> Changes may not be saved until your connection
-        returns.
+    <div
+      className={`${styles.banner} ${restored ? styles.restored : ''}`}
+      role="status"
+      aria-live="polite"
+    >
+      <span className={styles.light} aria-hidden="true" />
+
+      {restored ? <Wifi size={15} aria-hidden="true" /> : <WifiOff size={15} aria-hidden="true" />}
+
+      <span className={styles.label}>
+        {restored ? 'Connection restored' : 'Connection lost'}
       </span>
+
+      {!restored && (
+        <span className={styles.detail}>
+          You’re offline. Changes may not sync until you’re connected again.
+        </span>
+      )}
     </div>
   );
 }

@@ -35,7 +35,7 @@
   padding: 0 var(--space-3);
 
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-ink);
 }
 
 .topbarBrand {
@@ -44,6 +44,34 @@
   gap: var(--space-2);
   font-weight: 700;
   font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+}
+
+/* Pushed to the trailing edge and sized past the 44px touch minimum: this is
+   the primary action on mobile and must be hittable one-handed. */
+.topbarAction {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+
+  width: 2.5rem;
+  height: 2.5rem;
+
+  background: var(--primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--border-ink);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hard);
+
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+/* Press-down: the hard shadow collapses as the button moves into it. */
+.topbarAction:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 
 .topbarLogo {
@@ -68,7 +96,7 @@
 
   width: min(17rem, 82vw);
   background: var(--surface);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--border-ink);
 
   transform: translateX(-100%);
   transition: transform var(--transition);
@@ -99,8 +127,14 @@
 
 /* --- Desktop: persistent sidebar ------------------------------------------ */
 @media (min-width: 1024px) {
+  /* From here up the app is a fixed-height frame rather than a growing page:
+     the shell is exactly one viewport tall and the content column scrolls
+     inside it. This is what lets the board fill the screen and keep its
+     columns scrolling internally, without any page-height arithmetic. */
   .shell {
     flex-direction: row;
+    height: 100dvh;
+    overflow: hidden;
   }
 
   .topbar,
@@ -122,9 +156,19 @@
     /* Without this a wide board would stretch the flex item instead of
        scrolling inside its own column. */
     min-width: 0;
+    /* `min-height: 0` lets this shrink below its content so the scroll
+       actually happens here rather than on the page. */
+    min-height: 0;
+    overflow-y: auto;
   }
 
+  /* A flex column at full height, so a page that wants to fill the viewport
+     (the board) can, while a page that is simply long (analytics, settings)
+     still scrolls normally. */
   .contentInner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
     padding: var(--space-6);
   }
 }

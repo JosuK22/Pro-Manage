@@ -20,10 +20,36 @@ export const STATUS_TITLES = TASK_STATUSES.reduce((acc, status) => {
   return acc;
 }, {});
 
+/**
+ * `color` points at the design token rather than repeating a hex.
+ *
+ * These used to be literal values, which is how they drifted: the token layer
+ * was corrected for WCAG contrast but the constants kept the original bright
+ * hexes, so the dots the user actually saw were the uncorrected ones. Pointing
+ * at the variable means there is one place to change a priority colour.
+ *
+ * `label` is what makes priority readable without colour vision — the dot is
+ * a redundant cue, never the only one.
+ */
 export const TASK_PRIORITIES = [
-  { value: 'high', label: 'HIGH PRIORITY', shortLabel: 'High', color: '#ff2473' },
-  { value: 'moderate', label: 'MODERATE PRIORITY', shortLabel: 'Moderate', color: '#18b0ff' },
-  { value: 'low', label: 'LOW PRIORITY', shortLabel: 'Low', color: '#63c05b' },
+  {
+    value: 'high',
+    label: 'HIGH PRIORITY',
+    shortLabel: 'High',
+    color: 'var(--priority-high)',
+  },
+  {
+    value: 'moderate',
+    label: 'MODERATE PRIORITY',
+    shortLabel: 'Moderate',
+    color: 'var(--priority-moderate)',
+  },
+  {
+    value: 'low',
+    label: 'LOW PRIORITY',
+    shortLabel: 'Low',
+    color: 'var(--priority-low)',
+  },
 ];
 
 export const PRIORITY_VALUES = TASK_PRIORITIES.map((priority) => priority.value);

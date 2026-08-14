@@ -100,6 +100,7 @@ export default function Settings() {
   return (
     <div className={styles.container}>
       <PageHeader
+        eyebrow="Account"
         title="Settings"
         description="Manage your profile and sign-in details."
       />
@@ -166,12 +167,19 @@ export default function Settings() {
         </p>
 
         <div className={styles.actions}>
-          <Button type="submit" disabled={isSubmitting || !isModified}>
+          {/* The button stays disabled until something actually changed, so
+              "Save changes" never implies work that would be a no-op. */}
+          <Button type="submit" loading={isSubmitting} disabled={!isModified}>
             {isSubmitting ? 'Saving…' : 'Save changes'}
           </Button>
+
+          {isModified && !isSubmitting && (
+            <p className={styles.unsaved} role="status">
+              You have unsaved changes
+            </p>
+          )}
         </div>
       </form>
-
     </div>
   );
 }

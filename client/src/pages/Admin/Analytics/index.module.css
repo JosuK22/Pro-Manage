@@ -1,44 +1,83 @@
+/* ---------------------------------------------------------------------------
+   Analytics — a readout, not a chart gallery.
+   Four headline figures, one completion summary, two distributions. The one
+   figure that implies action (overdue) links straight into a filtered board.
+   --------------------------------------------------------------------------- */
+
 .container {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  min-width: 0;
 }
 
-/* --- Summary tiles ------------------------------------------------------- */
-/* auto-fit + minmax means the tiles reflow from 1 column on a phone to 4 on a
-   desktop with no breakpoints of their own. */
+/* --- Headline tiles ------------------------------------------------------- */
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   gap: var(--space-3);
 }
 
 .tile {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'icon value'
+    'label label';
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+
   padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+
+  transition: box-shadow var(--motion-fast), transform var(--motion-fast),
+    border-color var(--motion-fast);
 }
 
 .tileIcon {
+  grid-area: icon;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   width: 2rem;
   height: 2rem;
-  margin-bottom: var(--space-1);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--neutral);
   color: var(--text-muted);
 }
 
+.tileValue {
+  grid-area: value;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text);
+}
+
+.tileLabel {
+  grid-area: label;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Tone colours the icon chip only, so the figure itself always keeps maximum
+   contrast against the card. */
 .primary .tileIcon {
   background: var(--primary-soft);
-  color: var(--primary-active);
+  color: var(--primary-ink);
 }
 
 .success .tileIcon {
@@ -48,41 +87,116 @@
 
 .error .tileIcon {
   background: var(--error-soft);
-  color: var(--error);
+  color: var(--priority-high);
 }
 
-.tileValue {
+.error .tileValue {
+  color: var(--priority-high);
+}
+
+/* A tile that goes somewhere looks like it does, and moves like the other
+   pressable surfaces in the app. */
+.tileLink {
+  cursor: pointer;
+  border-color: var(--border-ink);
+}
+
+.tileLink:hover {
+  box-shadow: var(--shadow-hard);
+  transform: translate(-1px, -1px);
+}
+
+.tileArrow {
+  opacity: 0.75;
+}
+
+/* --- Completion summary --------------------------------------------------- */
+.completion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.completionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.completionValue {
+  font-family: var(--font-mono);
   font-size: var(--text-2xl);
   font-weight: 600;
-  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--primary-ink);
 }
 
-.tileLabel {
+.completionMeter {
+  display: block;
+  height: 10px;
+
+  background: var(--neutral);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.completionFill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transition: width var(--motion-normal);
+}
+
+.completionNote {
   font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
-/* --- Breakdown panels ---------------------------------------------------- */
+.inlineLink {
+  color: var(--priority-high);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --- Distribution panels -------------------------------------------------- */
 .panels {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-  gap: var(--space-4);
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 900px) {
+  .panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
 }
 
 .panelTitle {
-  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
 }
 
 .rows {
@@ -92,50 +206,86 @@
   list-style: none;
 }
 
-/* The meter column collapses on very narrow screens so the label and value
-   always stay legible. */
+/* Label · bar · count · percent. The bar takes the slack so the numeric
+   columns stay aligned down the list. */
 .row {
   display: grid;
-  grid-template-columns: minmax(6rem, 1fr) minmax(3rem, 8rem) auto;
+  grid-template-columns: minmax(5.5rem, 8rem) 1fr auto auto;
   align-items: center;
   gap: var(--space-3);
-  font-size: var(--text-sm);
-}
-
-@media (max-width: 380px) {
-  .row {
-    grid-template-columns: 1fr auto;
-  }
-
-  .meter {
-    display: none;
-  }
 }
 
 .rowLabel {
+  font-size: var(--text-sm);
   color: var(--text-muted);
-  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .meter {
   display: block;
-  height: 0.4rem;
-  border-radius: var(--radius-full);
+  height: 8px;
+  min-width: 0;
+
   background: var(--neutral);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
 .meterFill {
   display: block;
   height: 100%;
-  border-radius: var(--radius-full);
   background: var(--primary);
-  transition: width var(--transition);
+  transition: width var(--motion-normal);
+}
+
+/* Distribution bars carry the same hues as the board, so a colour means the
+   same thing on both screens. */
+.done {
+  background: var(--success);
+}
+
+.high {
+  background: var(--priority-high);
+}
+
+.moderate {
+  background: var(--priority-moderate);
+}
+
+.low {
+  background: var(--priority-low);
 }
 
 .rowValue {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  color: var(--text);
+  min-width: 1.75rem;
   text-align: right;
-  min-width: 2ch;
+}
+
+.rowPercent {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-subtle);
+  min-width: 2.75rem;
+  text-align: right;
+}
+
+/* The percent column is the first thing to go when width runs out — the raw
+   count is the more useful of the two. */
+@media (max-width: 420px) {
+  .rowPercent {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: minmax(4.5rem, 7rem) 1fr auto;
+  }
 }

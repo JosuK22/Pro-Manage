@@ -20,9 +20,33 @@
   gap: var(--space-3);
 }
 
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--primary-ink);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* A short rule trailing the eyebrow — the console-panel cue, drawn with a
+   pseudo-element so it costs no markup and is invisible to screen readers. */
+.eyebrow::after {
+  content: '';
+  flex: 1;
+  max-width: 4rem;
+  height: 1px;
+  background: var(--border-strong);
+}
+
 .title {
   font-size: var(--text-2xl);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: var(--leading-tight);
   color: var(--text);
 }

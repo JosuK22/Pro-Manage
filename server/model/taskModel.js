@@ -100,6 +100,25 @@ const taskSchema = new mongoose.Schema(
       required: true,
       immutable: true,
     },
+
+    /**
+     * The workspace this task belongs to.
+     *
+     * Phase A of a four-step migration: nullable now, backfilled in Stage 4,
+     * used for authorization in Stage 8, and only then made `required` — in a
+     * *separate* deploy, once a count of `{ workspace: null }` returns zero.
+     * Making it required in the same release that introduces it would reject
+     * every write against un-migrated data.
+     *
+     * Nothing reads this field yet, so no index is created for it either; the
+     * workspace-leading indexes are designed in STAGE-3-REPORT.md and land with
+     * the queries that need them.
+     */
+    workspace: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Workspace',
+      default: null,
+    },
   },
   {
     toJSON: { virtuals: true },

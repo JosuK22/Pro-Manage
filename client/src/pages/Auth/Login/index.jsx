@@ -8,7 +8,7 @@ import { Lock, Mail } from 'lucide-react';
 
 import { AuthContext } from '../../../store/AuthProvider.jsx';
 import FormInput from '../../../components/form/InputBar/FormInput.jsx';
-import {Button, LineLoader} from '../../../components/ui';
+import { Button } from '../../../components/ui';
 import Form from '../Form/Form.jsx';
 import { authApi } from '../../../services';
 import { EMAIL_REGEX } from '../../../constants/task.js';
@@ -79,8 +79,8 @@ export default function Login() {
           mainIcon={<Lock />}
         />
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? <LineLoader /> : 'Login'}
+        <Button type="submit" loading={isSubmitting}>
+          {isSubmitting ? 'Logging in…' : 'Login'}
         </Button>
       </form>
     </Form>

@@ -105,8 +105,8 @@ export default function TasksContainer({
   if (error) {
     return (
       <ErrorState
-        title="Couldn’t load your tasks"
-        description="Something went wrong while fetching the board."
+        title="We couldn’t load your tasks"
+        description="Something went wrong on the way to the server. Your work is safe."
         onRetry={fetchTasks}
       />
     );
@@ -117,8 +117,8 @@ export default function TasksContainer({
   if (tasks && tasks.length === 0) {
     return hasActiveFilters ? (
       <EmptyState
-        title="No matching tasks"
-        description="Try a different search term or clear your filters."
+        title="No matches"
+        description="Nothing matches your current search and filters."
         action={
           <Button variant="outline" onClick={onClearFilters}>
             Clear filters
@@ -127,8 +127,8 @@ export default function TasksContainer({
       />
     ) : (
       <EmptyState
-        title="No tasks yet"
-        description="Create your first task and start organising your work."
+        title="Your workspace is clear"
+        description="No tasks yet. Create your first one to start organising your work."
         action={<Button onClick={onCreateTask}>Create task</Button>}
       />
     );

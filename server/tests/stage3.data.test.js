@@ -3,29 +3,9 @@ const request = require('supertest');
 const app = require('../app');
 const Task = require('../model/taskModel');
 
-const registerUser = async (overrides = {}) => {
-  const payload = {
-    name: 'Test User',
-    email: 'user@example.com',
-    password: 'a-good-long-password',
-    confirmPassword: 'a-good-long-password',
-    ...overrides,
-  };
-
-  const res = await request(app).post('/api/v1/auth/register').send(payload).expect(201);
-  return { token: res.body.data.token, user: res.body.data.info };
-};
-
-const createTask = (token, overrides = {}) =>
-  request(app)
-    .post('/api/v1/tasks')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      title: 'A task',
-      priority: 'low',
-      checklists: [{ title: 'step', checked: false }],
-      ...overrides,
-    });
+// Shared fixtures — see tests/factories.js. Previously duplicated verbatim
+// between this suite and stage2.security.test.js.
+const { createUser: registerUser, createTask } = require('./factories');
 
 /** Move a task's createdAt into the past, bypassing the immutable guard. */
 const backdate = (taskId, days) =>

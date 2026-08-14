@@ -114,8 +114,8 @@ export default function Register() {
           mainIcon={<LockKeyhole />}
         />
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Registering...' : 'Register'}
+        <Button type="submit" loading={isSubmitting}>
+          {isSubmitting ? 'Registering…' : 'Register'}
         </Button>
       </form>
     </Form>

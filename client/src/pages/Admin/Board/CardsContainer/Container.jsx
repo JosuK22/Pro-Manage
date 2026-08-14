@@ -3,7 +3,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { CopyMinus, Plus } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import { Text, IconButton, EmptyState } from '../../../../components/ui';
+import { IconButton, EmptyState } from '../../../../components/ui';
 import Card from '../Card/Card';
 
 import styles from './Container.module.css';
@@ -31,9 +31,9 @@ export default function Container({ tasks, category, onCreateTask }) {
     >
       <div className={styles.heading}>
         <div className={styles.headingText}>
-          <Text as="h3" step={3} weight="600">
-            {category.title}
-          </Text>
+          {/* Column names are technical labels, so they take the mono voice —
+              one of the few places the retro register costs nothing. */}
+          <h3 className={styles.columnTitle}>{category.title}</h3>
           <span className={styles.count}>{tasks.length}</span>
         </div>
 

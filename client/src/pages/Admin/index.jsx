@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, Plus } from 'lucide-react';
 
 import { AuthContext } from '../../store/AuthProvider';
 import Navigation from './Navigation/Navigation';
@@ -48,9 +48,12 @@ export default function AdminLayout() {
         reverseOrder={false}
         toastOptions={{
           style: {
-            background: 'var(--surface)',
+            background: 'var(--surface-raised)',
             color: 'var(--text)',
-            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid var(--border-ink)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-hard-ink)',
+            fontSize: 'var(--text-sm)',
           },
         }}
       />
@@ -70,6 +73,15 @@ export default function AdminLayout() {
           <img src={logo} alt="" className={styles.topbarLogo} />
           Pro Manage
         </span>
+
+        {/* Creating a task is the number-one mobile action, so it lives in the
+            thumb-reachable bar on every screen rather than only on the board.
+            The board reads `?new=task` and opens its dialog — which also means
+            the browser back button closes it. */}
+        <Link to="/?new=task" className={styles.topbarAction}>
+          <Plus size={18} aria-hidden="true" />
+          <span className="srOnly">New task</span>
+        </Link>
       </header>
 
       {/* Backdrop only exists while the drawer is open on small screens. */}

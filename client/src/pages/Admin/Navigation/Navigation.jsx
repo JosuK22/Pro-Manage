@@ -6,6 +6,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Button, Text, Modal, Avatar } from '../../../components/ui';
 import { AuthContext } from '../../../store/AuthProvider';
 import useModal from '../../../hooks/useModal';
+import useOnlineStatus from '../../../hooks/useOnlineStatus';
 
 import logo from '../../../assets/logo.png';
 
@@ -20,19 +21,27 @@ const LINKS = [
 export default function Navigation({ user, onNavigate }) {
   const { logout } = useContext(AuthContext);
   const { isOpen, toggleModal } = useModal();
+  const isOnline = useOnlineStatus();
 
   return (
     <>
       <div className={styles.container}>
         <Link to="/" className={styles.logo} onClick={onNavigate}>
           <img src={logo} alt="" className={styles.logoImage} />
-          <Text as="span" step={4} weight="800">
-            Pro Manage
-          </Text>
+          <span className={styles.wordmark}>
+            <Text as="span" step={4} weight="800" className={styles.brandName}>
+              Pro Manage
+            </Text>
+            <span className={styles.brandSub}>Task console</span>
+          </span>
         </Link>
 
         {/* A real <nav> landmark: screen-reader users can jump straight here. */}
         <nav className={styles.nav} aria-label="Main">
+          <p className={styles.sectionLabel} aria-hidden="true">
+            Navigation
+          </p>
+
           <ul className={styles.links}>
             {LINKS.map((link) => (
               <li key={link.to}>
@@ -55,6 +64,18 @@ export default function Navigation({ user, onNavigate }) {
         </nav>
 
         <div className={styles.footer}>
+          {/* Real state, not decoration: the console tells you whether the app
+              can currently reach the server. */}
+          <p className={styles.status}>
+            <span
+              className={`${styles.light} ${isOnline ? styles.online : styles.offline}`}
+              aria-hidden="true"
+            />
+            <span className={styles.statusLabel}>
+              {isOnline ? 'Online' : 'Offline'}
+            </span>
+          </p>
+
           {user?.info && (
             <div className={styles.account}>
               <Avatar email={user.info.email} size="md" />

@@ -347,6 +347,14 @@ non-operational and logs the detail server-side.
 
 **Request size.** Bodies are capped at 100kb.
 
+**Dependencies.** `npm audit` reports zero vulnerabilities on the server and
+two moderate ones on the client, both from `react-router` 6. The advisories
+cover SSR hydration (this is a client-rendered SPA, so that path does not
+exist) and an open redirect via backslashes in `<Link>`/`useNavigate` — the app
+only ever navigates to literal in-app paths, never to a user-supplied URL.
+Clearing them requires the React Router 6 → 7 migration, which is deliberately
+left as a separate piece of work rather than folded in untested.
+
 ---
 
 ## Deployment

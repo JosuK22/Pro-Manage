@@ -3,7 +3,6 @@ import Button from './Button/Button';
 import IconButton from './IconButton/IconButton';
 import Modal from './Modal/Modal';
 import Badge from './Badge/Badge';
-import LineLoader from './Loaders/ButtonLoader/ButtonLoader';
 import AstroLoader from './Loaders/AstronutLoader/astronut';
 import Avatar from './Avatar/Avatar';
 import OfflineBanner from './OfflineBanner/OfflineBanner';
@@ -24,7 +23,6 @@ export {
   IconButton,
   Modal,
   Badge,
-  LineLoader,
   AstroLoader,
   Avatar,
   OfflineBanner,

@@ -25,16 +25,27 @@
   }
 }
 
+/* Each group is a panel, so Profile and Security read as separate concerns
+   rather than one long column of inputs. */
 .section {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  border: none;
+
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
 }
 
 .legend {
-  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding: 0 var(--space-2);
   margin-bottom: var(--space-2);
 }
 
@@ -45,15 +56,42 @@
 }
 
 .notice {
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: var(--warning-soft);
   color: var(--warning);
+  border: 1px solid var(--warning);
+  border-left-width: 3px;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
 }
 
+.unsaved {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  align-self: center;
+
+  /* Wraps to its own line on narrow screens rather than competing with the
+     button for the row. `order` puts it before the button once wrapped. */
+  flex: 1 0 100%;
+  order: -1;
+}
+
+@media (min-width: 480px) {
+  .unsaved {
+    flex: 0 0 auto;
+    order: 0;
+  }
+}
+
 .actions {
   display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
 .actions > * {

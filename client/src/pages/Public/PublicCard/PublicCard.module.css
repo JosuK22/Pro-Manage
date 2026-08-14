@@ -1,17 +1,21 @@
-/* Mobile-first: full width on a phone, capped and centred from tablet up. The
-   old rule was `width: 40%; min-width: 350px`, which overflowed at 320px. */
+/* ---------------------------------------------------------------------------
+   Public shared task — a read-only work document.
+   Mobile-first: one column, generous type, no interactive affordances beyond
+   the link back. Deliberately not styled like the authenticated board card.
+   --------------------------------------------------------------------------- */
+
 .container {
-  width: 100%;
-  max-width: 34rem;
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 
-  padding: var(--space-5) var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  width: 100%;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+
+  background: var(--surface-raised);
+  border: 1px solid var(--border-ink);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-hard-ink);
 }
 
 @media (min-width: 640px) {
@@ -20,19 +24,110 @@
   }
 }
 
-.header {
+/* --- Header plate --------------------------------------------------------- */
+.plate {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  flex-wrap: wrap;
+
+  padding-bottom: var(--space-3);
+  border-bottom: 1px dashed var(--border-strong);
 }
 
-.priority {
+.ref {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Read-only status is stated, not implied by the absence of controls. */
+.readOnly {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+
+  padding: var(--space-1) var(--space-2);
+  background: var(--neutral);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* --- Field list ----------------------------------------------------------- */
+.fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 520px) {
+  .fields {
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.fieldValue {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
+  min-width: 0;
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.high {
+  color: var(--priority-high);
+}
+
+.moderate {
+  color: var(--priority-moderate);
+}
+
+.low {
+  color: var(--priority-low);
 }
 
 .dot {
@@ -42,68 +137,116 @@
   flex: none;
 }
 
-/* Long titles wrap onto as many lines as they need instead of being clipped
-   to a fixed 60% width with a hover-only tooltip. */
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 600;
-  line-height: var(--leading-tight);
-  overflow-wrap: break-word;
+.assigneeName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
 }
 
-.readOnlyNote {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  background: var(--surface-sunken);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-3);
+.overdue {
+  color: var(--priority-high);
 }
 
+.overdueTag {
+  padding: 0 var(--space-2);
+  background: var(--error-soft);
+  border: 1px solid var(--priority-high);
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+/* --- Checklist ------------------------------------------------------------ */
 .checklists {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
+.checklistHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.progressCount {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.meter {
+  display: block;
+  height: 8px;
+  background: var(--neutral);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+}
+
 .lists {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
   list-style: none;
-  max-height: 22rem;
-  overflow-y: auto;
 }
 
 .list {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
+
   padding: var(--space-3);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+}
+
+/* Completed items go quieter but stay legible — the list is a record. */
+.listDone label {
+  color: var(--text-muted);
+  text-decoration: line-through;
 }
 
 .list input[type='checkbox'] {
+  flex: none;
   width: 1.05rem;
   height: 1.05rem;
-  margin-top: 0.1rem;
-  flex: none;
-  accent-color: var(--primary);
+  margin-top: 0.15rem;
+  accent-color: var(--primary-ink);
+  /* Read-only, but not faded to the point of being unreadable. */
+  opacity: 0.9;
 }
 
 .list label {
   min-width: 0;
-  overflow-wrap: break-word;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
 }
 
-.dueDate {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+.emptyNote {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }

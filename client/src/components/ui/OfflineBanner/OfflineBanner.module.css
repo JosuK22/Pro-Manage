@@ -1,31 +1,62 @@
+/* Anchored bottom-left so it never covers the primary action or the toasts,
+   which arrive top-centre. */
 .banner {
   position: fixed;
-  left: 50%;
   bottom: var(--space-4);
-  transform: translateX(-50%);
+  left: var(--space-4);
+  right: var(--space-4);
   z-index: var(--z-toast);
 
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  flex-wrap: wrap;
 
-  width: max-content;
-  max-width: calc(100vw - var(--space-6));
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
 
-  background: var(--warning-soft);
-  color: var(--warning);
-  border: 1px solid currentColor;
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-md);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-ink);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hard-ink);
 
   font-size: var(--text-sm);
-  text-align: left;
 }
 
-@media (max-width: 639px) {
+/* The status light: the one place a small colour dot is worth it, and it is
+   always paired with the text label beside it. */
+.light {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--error);
+  box-shadow: 0 0 0 3px var(--error-soft);
+}
+
+.restored .light {
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-soft);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+.detail {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
   .banner {
-    border-radius: var(--radius-md);
-    bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+    right: auto;
+    max-width: 34rem;
   }
 }

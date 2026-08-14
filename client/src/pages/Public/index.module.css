@@ -11,7 +11,18 @@
   gap: var(--space-2);
   padding: var(--space-4) var(--space-5);
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-ink);
+}
+
+/* Names the document type for someone arriving cold from a link. */
+.shared {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-subtle);
 }
 
 .image {
@@ -34,6 +45,13 @@
   align-items: flex-start;
   justify-content: center;
   padding: var(--space-4);
+}
+
+/* Caps the document width so a long title doesn't run the full width of a
+   desktop monitor. */
+.main > * {
+  width: 100%;
+  max-width: 44rem;
 }
 
 @media (min-width: 640px) {

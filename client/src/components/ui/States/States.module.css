@@ -3,7 +3,7 @@
   background: linear-gradient(
     90deg,
     var(--neutral) 25%,
-    #e4ebef 37%,
+    var(--surface) 37%,
     var(--neutral) 63%
   );
   background-size: 400% 100%;

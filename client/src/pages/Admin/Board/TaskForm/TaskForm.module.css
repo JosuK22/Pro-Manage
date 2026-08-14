@@ -1,10 +1,25 @@
-/* Fields stack vertically at every width — the old form had a 700px minimum
-   that overflowed any phone. */
+/* ---------------------------------------------------------------------------
+   Task form.
+   Ordered by how much the answer matters: the title question dominates, then
+   priority, then who/when, then the checklist. The action row is pinned so
+   "Create task" is reachable without scrolling past a long checklist.
+   --------------------------------------------------------------------------- */
+
 .form {
   display: flex;
   flex-direction: column;
+  min-height: 0;
   gap: var(--space-4);
-  min-width: 0;
+}
+
+/* The body scrolls; the action row below does not. */
+.scrollArea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: var(--space-1);
 }
 
 .field {
@@ -14,28 +29,44 @@
   min-width: 0;
 }
 
-.field > label,
-.field > :global(label) {
-  font-size: var(--text-sm);
-  font-weight: 500;
+.primaryLabel {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 
-.field input[type='text'] {
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* The one input the whole dialog exists for — sized accordingly. */
+.titleInput {
   width: 100%;
-  padding: var(--space-3);
-  border: 1px solid var(--border-strong);
+  padding: var(--space-3) var(--space-4);
+
+  background: var(--surface-raised);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
+
+  font-size: var(--text-lg);
+  color: var(--text);
+}
+
+.titleInput::placeholder {
+  color: var(--text-subtle);
   font-size: var(--text-base);
 }
 
-.field input[type='text']:focus-visible {
+.titleInput:focus-visible {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--primary-ink);
   box-shadow: 0 0 0 3px var(--primary-soft);
-}
-
-.required {
-  color: var(--error);
 }
 
 .error {
@@ -44,7 +75,6 @@
 }
 
 /* --- Priority ------------------------------------------------------------- */
-/* Wraps to as many rows as it needs instead of forcing one line. */
 .priorities {
   display: flex;
   flex-wrap: wrap;
@@ -52,32 +82,40 @@
 }
 
 .priorityOption {
-  flex: 1 1 9rem;
-  min-width: 0;
+  cursor: pointer;
 }
 
 .priority {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-2);
 
-  padding: var(--space-3) var(--space-2);
-  border: 1px solid var(--border-strong);
+  padding: var(--space-2) var(--space-3);
+  min-height: 2.5rem;
+
+  background: var(--surface);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
 
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--text-muted);
   white-space: nowrap;
-  cursor: pointer;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+
+  transition: border-color var(--motion-fast), background var(--motion-fast),
+    color var(--motion-fast), box-shadow var(--motion-fast);
 }
 
+/* Selection is carried by border weight, fill and shadow — not colour alone,
+   and the dot stays a redundant cue rather than the only one. */
 .priorityChecked {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-  color: var(--primary-active);
-  font-weight: 600;
+  background: var(--surface-raised);
+  border-color: var(--border-ink);
+  color: var(--text);
+  box-shadow: var(--shadow-hard);
 }
 
 .dot {
@@ -87,116 +125,166 @@
   flex: none;
 }
 
-/* --- Checklist ------------------------------------------------------------ */
-.checklists {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  border: none;
-  min-width: 0;
+/* --- Who and when --------------------------------------------------------- */
+.metaRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
 }
 
-.checklists legend {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  margin-bottom: var(--space-2);
-}
-
-.lists {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  max-height: 14rem;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 2px;
-}
-
-.list {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
-
-  padding: var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.list input[type='checkbox'] {
-  width: 1rem;
-  height: 1rem;
-  flex: none;
-  accent-color: var(--primary);
-}
-
-.list input[type='text'] {
-  flex: 1;
-  min-width: 0;
-  padding: var(--space-2);
-  border: none;
-  font-size: var(--text-sm);
-  background: transparent;
-}
-
-.list input[type='text']:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
-  border-radius: var(--radius-sm);
-}
-
-/* --- Actions -------------------------------------------------------------- */
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
+@media (min-width: 560px) {
+  .metaRow {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .dueDateGroup {
   position: relative;
 }
 
+.dueButton {
+  width: 100%;
+  justify-content: flex-start;
+}
+
 .datePicker {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + var(--space-2));
+  left: 0;
+
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  align-items: center;
+  padding: var(--space-2);
 
-  margin-top: var(--space-2);
-  padding: var(--space-3);
-
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-ink);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
+
+  /* Never wider than the viewport on a phone. */
+  max-width: calc(100vw - var(--space-6));
 }
 
-.submitGroup {
+/* --- Checklist ------------------------------------------------------------ */
+.checklists {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+}
+
+.legendCount {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.meter {
+  display: block;
+  height: 6px;
+  background: var(--neutral);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transition: width var(--motion-normal);
+}
+
+.lists {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  padding: var(--space-2);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  transition: opacity var(--motion-fast);
+}
+
+/* Completed items go quieter rather than disappearing, so the list still
+   reads as a record of what was done. */
+.listDone {
+  opacity: 0.62;
+}
+
+.listDone input[type='text'] {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.list input[type='checkbox'] {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--primary-ink);
+  cursor: pointer;
+}
+
+.list input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-1);
+  border: none;
+  background: transparent;
+  font-size: var(--text-sm);
+}
+
+.list input[type='text']:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 2px var(--primary-soft);
+}
+
+.addItem {
+  align-self: flex-start;
+  min-width: 0;
+}
+
+/* --- Actions -------------------------------------------------------------- */
+.actions {
   display: flex;
   flex-direction: column-reverse;
   gap: var(--space-2);
+  flex: none;
+
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 
 @media (min-width: 480px) {
   .actions {
     flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 
-  .submitGroup {
-    flex-direction: row;
-  }
-
-  /* The picker floats above the layout on wider screens so it doesn't push
-     the action row down. */
-  .datePicker {
-    position: absolute;
-    bottom: calc(100% + var(--space-2));
-    left: 0;
-    margin-top: 0;
-    z-index: var(--z-dropdown);
+  .actions > * {
+    flex: 0 1 11rem;
   }
 }

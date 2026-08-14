@@ -4,9 +4,11 @@
   justify-content: center;
   flex: none;
   border-radius: 50%;
-  background: #ffebeb;
-  color: #4a4a4a;
-  font-weight: 500;
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+  border: 1px solid var(--primary-ink);
+  font-family: var(--font-mono);
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -33,9 +35,10 @@
 
 /* Visually distinct from a real assignee so "nobody" never reads as "someone". */
 .unassigned {
-  background: #f1f3f5;
-  color: #8c959d;
-  border: 1px dashed #ccd3d9;
+  background: var(--neutral);
+  color: var(--text-subtle);
+  /* Dashed, not solid: "nobody" reads as an open slot rather than a person. */
+  border: 1px dashed var(--border-input);
 }
 
 .icon {

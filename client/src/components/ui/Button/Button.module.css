@@ -16,12 +16,24 @@
   letter-spacing: 0.02em;
   text-align: center;
 
-  border: 1px solid transparent;
+  border: 1px solid var(--border-ink);
   border-radius: var(--radius-md);
   cursor: pointer;
 
-  transition: background-color var(--transition-fast), border-color var(--transition-fast),
-    color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: background-color var(--motion-fast), border-color var(--motion-fast),
+    color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast);
+}
+
+/* Retro press: the button carries a solid offset edge and moves into it when
+   pressed. Mechanical rather than decorative — it makes the click feel like it
+   registered, which matters most on the actions people repeat all day. */
+.button:not(:disabled) {
+  box-shadow: var(--shadow-hard);
+}
+
+.button:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 
 .primary {
@@ -128,10 +140,48 @@
   background-color: var(--primary-soft);
 }
 
+/* Ghost buttons are quiet by definition — they opt out of the offset edge and
+   the press travel. Specificity here has to match `.button:not(:disabled)`
+   above, or the base rule wins and every ghost grows a shadow. */
+.ghost:not(:disabled),
+.ghost:not(:disabled):active {
+  box-shadow: none;
+  transform: none;
+}
+
 /* In-flight and unavailable actions must look and behave inert, so a second
    click cannot fire a duplicate request. */
 .button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
   box-shadow: none;
+}
+
+/* Replaces the `react-loader-spinner` <LineWave>, which pulled in
+   styled-components + postcss for a single spinner on a single screen.
+   `currentColor` means it works on every button variant without a colour prop. */
+.spinner {
+  flex: none;
+  width: 0.875em;
+  height: 0.875em;
+
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+
+  animation: buttonSpin 0.6s linear infinite;
+}
+
+@keyframes buttonSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    /* Still visibly a "busy" indicator, just not a spinning one. */
+    animation: none;
+    opacity: 0.6;
+  }
 }

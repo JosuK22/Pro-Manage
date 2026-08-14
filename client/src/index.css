@@ -1,51 +1,88 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 /* ===========================================================================
-   Pro-Manage design tokens
+   Pro-Manage design tokens — retro × modern
    ---------------------------------------------------------------------------
    One source of truth for colour, spacing, radius, elevation, typography,
-   motion, breakpoints and layering. Components reference these variables
-   instead of repeating literal values, which is what let the old stylesheets
-   drift into a dozen different greys and five different card radii.
+   motion, breakpoints and layering.
+
+   The direction is "command center for your work": the warmth and crispness of
+   1980s productivity software, carried by a modern token system. The retro
+   character lives in three places only — a warm paper ground, tight corners
+   with hard offset edges, and a monospace voice for technical metadata. It is
+   deliberately NOT in scanlines, glow, or decorative noise, because this is a
+   tool people use all day.
+
+   Every text colour below is verified against every ground it can sit on at
+   WCAG AA (4.5:1). Priority hues keep that guarantee from the previous pass.
    =========================================================================== */
 
 :root {
-  /* --- Brand ------------------------------------------------------------ */
+  /* --- Brand -------------------------------------------------------------
+     The teal identity is retained. `--primary` is the fill colour; text and
+     focus rings use `--primary-ink`, which is dark enough to pass AA on the
+     warm grounds where the raw teal would not.                             */
   --primary: #17a2b8;
   --primary-hover: #148fa3;
-  --primary-active: #117d8e;
-  --primary-soft: #e7f6f8;
-  --primary-focus: #1baec5;
+  --primary-active: #0e6b7a;
+  --primary-ink: #0d6f7f;
+  --primary-soft: #ddeef1;
+  --primary-focus: #0d6f7f;
 
-  /* --- Priority (kept from the original identity) ----------------------- */
-  --priority-high: #e01a5f; /* darkened from #ff2473 to reach AA on white */
-  --priority-moderate: #0d84c9; /* darkened from #18b0ff to reach AA on white */
-  --priority-low: #3f8f38; /* darkened from #63c05b to reach AA on white */
+  /* --- Retro accent ------------------------------------------------------
+     Amber is the second voice: status lights, "attention required" markers,
+     the active-navigation indicator. `--amber` fills, `--amber-ink` is for
+     text. Used sparingly — it earns attention by being rare.               */
+  --amber: #e9a319;
+  --amber-ink: #8a5a00;
+  --amber-soft: #fbefd6;
 
-  /* --- Feedback --------------------------------------------------------- */
-  --error: #d32f2f;
-  --error-hover: #b52626;
-  --error-soft: #fdecec;
-  --success: #2e7d32;
-  --success-soft: #eaf4ea;
-  --warning: #b26a00;
-  --warning-soft: #fdf3e3;
+  /* --- Priority ----------------------------------------------------------
+     Corrected for contrast in the previous pass. These are now the single
+     source: the JS constants reference these variables rather than repeating
+     literal hexes, which is how the corrected values came to be ignored.   */
+  --priority-high: #c41850;
+  --priority-moderate: #0a6598;
+  --priority-low: #316b2c;
 
-  /* --- Surfaces & text -------------------------------------------------- */
-  --surface: #ffffff;
+  /* --- Feedback ---------------------------------------------------------- */
+  --error: #bf2e24;
+  --error-hover: #a3241b;
+  --error-soft: #fbe9e7;
+  --success: #276b2a;
+  --success-soft: #e8f1e6;
+  --warning: #8a5100;
+  --warning-soft: #fbefd6;
+
+  /* --- Surfaces ----------------------------------------------------------
+     A warm paper ground with lighter surfaces sitting on top of it — the
+     inverse of the old cool grey-blue scheme, and the single biggest carrier
+     of the retro feel.                                                     */
+  --page-bg: #efede6;
+  --surface: #fbfaf6;
   --surface-raised: #ffffff;
-  --surface-sunken: #f4f7f9;
-  --page-bg: #f4f7f9;
-  --neutral: #eef2f5;
-  --main-color: #ffffff; /* retained: referenced by existing modules */
+  --surface-sunken: #e7e4da;
+  --neutral: #e4e1d7;
+  --main-color: #fbfaf6; /* retained: referenced by existing modules */
 
-  --border: #e2e8ec;
-  --border-strong: #ccd6dd;
+  /* --- Borders -----------------------------------------------------------
+     Three weights, each with a job. `--border` separates surfaces,
+     `--border-input` bounds interactive controls (>=3:1, WCAG 1.4.11), and
+     `--border-ink` is the crisp near-black outline that gives retro elements
+     their definition.                                                      */
+  --border: #d9d5c8;
+  --border-strong: #b3ac97;
+  --border-input: #8a8371;
+  --border-ink: #2a2724;
 
-  --text: #1f2933;
-  --text-muted: #5b6b78; /* 5.4:1 on white — the old #767575/opacity:0.4 was not AA */
-  --text-subtle: #7b8794;
+  /* --- Text --------------------------------------------------------------
+     Warm charcoal rather than blue-grey, so type sits on the paper ground
+     instead of floating above it. All three pass AA on all three surfaces. */
+  --text: #22201b;
+  --text-muted: #5e594c;
+  --text-subtle: #6a6455;
   --text-inverse: #ffffff;
 
   /* --- Spacing (4px base) ----------------------------------------------- */
@@ -57,21 +94,37 @@
   --space-6: 2rem;
   --space-7: 3rem;
 
-  /* --- Radius ----------------------------------------------------------- */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* --- Radius ------------------------------------------------------------
+     Tightened from the previous 6/10/16/20. Retro software had square-ish
+     corners; softening them to 16px was what made the old board read as
+     generic modern SaaS. Small radii also make the hard shadow below land.  */
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
   --radius-full: 999px;
 
-  /* --- Elevation -------------------------------------------------------- */
-  --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
-  --shadow-md: 0 2px 4px -2px rgb(16 24 40 / 6%), 0 4px 8px -2px rgb(16 24 40 / 10%);
-  --shadow-lg: 0 4px 6px -2px rgb(16 24 40 / 4%), 0 12px 16px -4px rgb(16 24 40 / 10%);
+  /* --- Elevation ---------------------------------------------------------
+     Two systems, used for different things. Soft shadows lift transient
+     surfaces (menus, dialogs, toasts). Hard offset shadows are the retro
+     bevel — no blur, a solid displaced edge — used on things that should
+     feel physical and pressable.                                           */
+  --shadow-sm: 0 1px 2px rgb(40 34 20 / 8%);
+  --shadow-md: 0 2px 6px rgb(40 34 20 / 10%);
+  --shadow-lg: 0 8px 24px rgb(40 34 20 / 14%);
   --box-shadow: var(--shadow-md); /* retained: referenced by existing modules */
 
-  /* --- Typography ------------------------------------------------------- */
+  --shadow-hard: 2px 2px 0 0 var(--border-strong);
+  --shadow-hard-ink: 3px 3px 0 0 var(--border-ink);
+  --shadow-hard-primary: 2px 2px 0 0 var(--primary-ink);
+
+  /* --- Typography --------------------------------------------------------
+     Poppins carries the interface. IBM Plex Mono is the technical voice —
+     task IDs, counts, dates, status labels, analytics figures. It was chosen
+     over the usual coding monos for its IBM lineage, which is the actual
+     history this design is referencing.                                    */
   --font-sans: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Fluid scale: readable at 320px, comfortable at 1440px+. */
   --text-xs: clamp(0.6875rem, 0.66rem + 0.14vw, 0.75rem);
@@ -85,18 +138,35 @@
   --leading-tight: 1.25;
   --leading-normal: 1.5;
 
-  /* --- Motion ----------------------------------------------------------- */
+  /* Technical micro-label: the uppercase mono caption used for section
+     eyebrows, column headers and metadata keys. One definition so every
+     label in the app matches.                                              */
+  --label-size: 0.6875rem;
+  --label-tracking: 0.12em;
+  --label-weight: 600;
+
+  /* --- Motion ------------------------------------------------------------
+     Unchanged durations. `--motion-*` are aliases so new work can use the
+     clearer names without a rename sweep across every existing module.     */
   --transition-fast: 120ms ease;
   --transition: 200ms ease;
+  --motion-fast: var(--transition-fast);
+  --motion-normal: var(--transition);
 
-  /* --- Layering --------------------------------------------------------- */
+  /* --- Retro texture -----------------------------------------------------
+     A faint grid, at the strength of graph paper rather than a screen
+     effect. Applied to large empty grounds only, never behind text.        */
+  --grid-line: rgb(42 39 36 / 4.5%);
+  --grid-size: 22px;
+
+  /* --- Layering ---------------------------------------------------------- */
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-drawer: 300;
   --z-modal: 400;
   --z-toast: 500;
 
-  /* --- Layout ----------------------------------------------------------- */
+  /* --- Layout ------------------------------------------------------------ */
   --sidebar-width: 250px;
   --header-height: 3.5rem;
 
@@ -158,9 +228,10 @@ textarea {
 
 /* --- Focus -----------------------------------------------------------------
    Outlines are never removed globally. `:focus-visible` shows a ring for
-   keyboard users without adding one on mouse clicks.                        */
+   keyboard users without adding one on mouse clicks. The ring uses
+   `--primary-ink` so it clears 3:1 against every surface in the palette.    */
 :focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--primary-ink);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -177,7 +248,27 @@ textarea {
   }
 }
 
-/* --- Screen-reader-only helper ------------------------------------------- */
+/* --- Utilities -------------------------------------------------------------
+   Two shared treatments that would otherwise be re-declared in a dozen CSS
+   modules. Kept global because they are typographic primitives, not
+   components.                                                               */
+
+/* Uppercase monospace micro-label: "WORK QUEUE", "STATUS", "DUE". */
+.techLabel {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Monospace figures that line up in columns: counts, IDs, dates. */
+.techValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -191,8 +282,8 @@ textarea {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -201,6 +292,7 @@ textarea {
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--border-strong);
+  border: 2px solid var(--page-bg);
   border-radius: var(--radius-full);
 }
 

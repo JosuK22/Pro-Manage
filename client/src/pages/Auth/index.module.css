@@ -57,7 +57,7 @@
     width: min(300px, 60%);
     aspect-ratio: 1;
     border-radius: 50%;
-    background: #317f8b;
+    background: var(--primary-ink);
     z-index: -1;
   }
 }

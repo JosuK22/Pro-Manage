@@ -60,6 +60,8 @@ export default function PublicLayout() {
         <Text as="span" step={4} weight="600">
           Pro Manage
         </Text>
+
+        <span className={styles.shared}>Shared task</span>
       </header>
 
       <main className={styles.main}>{content}</main>

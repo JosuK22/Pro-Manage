@@ -4,30 +4,10 @@ const jwt = require('jsonwebtoken');
 const app = require('../app');
 const Task = require('../model/taskModel');
 
-const registerUser = async (overrides = {}) => {
-  const payload = {
-    name: 'Test User',
-    email: 'user@example.com',
-    password: 'a-good-long-password',
-    confirmPassword: 'a-good-long-password',
-    ...overrides,
-  };
-
-  const res = await request(app).post('/api/v1/auth/register').send(payload).expect(201);
-
-  return { token: res.body.data.token, user: res.body.data.info };
-};
-
-const createTask = (token, overrides = {}) =>
-  request(app)
-    .post('/api/v1/tasks')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      title: 'A task',
-      priority: 'low',
-      checklists: [{ title: 'step', checked: false }],
-      ...overrides,
-    });
+// Shared fixtures. These were defined inline here and again, identically, in
+// stage3.data.test.js; `factories.js` is also the single seam through which the
+// workspace header will arrive during the RBAC migration.
+const { createUser: registerUser, createTask } = require('./factories');
 
 describe('Stage 2 — security hardening', () => {
   describe('security headers', () => {

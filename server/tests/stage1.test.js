@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 const app = require('../app');
 const User = require('../model/userModel');
+const { createUser, createTask } = require('./factories');
 
 const VALID_USER = {
   name: 'Ada Lovelace',
@@ -150,22 +151,15 @@ describe('Stage 1 — critical production defects', () => {
     });
   });
 
+  // These use the shared factories: what is under test is the *public
+  // projection*, not registration, so the setup should not be spelled out.
   describe('public task view', () => {
     it('renders an unassigned task as assignee: null rather than crashing', async () => {
-      const auth = await request(app)
-        .post('/api/v1/auth/register')
-        .send(VALID_USER)
-        .expect(201);
+      const owner = await createUser();
 
-      const created = await request(app)
-        .post('/api/v1/tasks')
-        .set('Authorization', `Bearer ${auth.body.data.token}`)
-        .send({
-          title: 'Task with nobody assigned',
-          priority: 'low',
-          checklists: [{ title: 'First step', checked: false }],
-        })
-        .expect(201);
+      const created = await createTask(owner, {
+        title: 'Task with nobody assigned',
+      }).expect(201);
 
       const res = await request(app)
         .get(`/api/v1/tasks/${created.body.data.task._id}`)
@@ -175,20 +169,12 @@ describe('Stage 1 — critical production defects', () => {
     });
 
     it('does not expose ownership fields to anonymous viewers', async () => {
-      const auth = await request(app)
-        .post('/api/v1/auth/register')
-        .send(VALID_USER)
-        .expect(201);
+      const owner = await createUser();
 
-      const created = await request(app)
-        .post('/api/v1/tasks')
-        .set('Authorization', `Bearer ${auth.body.data.token}`)
-        .send({
-          title: 'Shared task',
-          priority: 'high',
-          checklists: [{ title: 'Step', checked: false }],
-        })
-        .expect(201);
+      const created = await createTask(owner, {
+        title: 'Shared task',
+        priority: 'high',
+      }).expect(201);
 
       const res = await request(app)
         .get(`/api/v1/tasks/${created.body.data.task._id}`)

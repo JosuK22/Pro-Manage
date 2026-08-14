@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import Avatar from '../src/components/ui/Avatar/Avatar';
 import Badge from '../src/components/ui/Badge/Badge';
+import Button from '../src/components/ui/Button/Button';
 import Modal from '../src/components/ui/Modal/Modal';
 import PublicCard from '../src/pages/Public/PublicCard/PublicCard';
 
@@ -60,6 +61,54 @@ describe('Badge', () => {
 
     await userEvent.keyboard('{Enter}');
     expect(onClick).toHaveBeenCalled();
+  });
+});
+
+describe('Button', () => {
+  // A bare <button> inside a <form> defaults to type="submit", which is how
+  // unrelated controls (the checklist trash icon) used to submit the task form.
+  it('defaults to type="button" so it cannot submit a form by accident', () => {
+    render(<Button>Delete row</Button>);
+
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
+  });
+
+  it('submits only when it explicitly opts in', () => {
+    render(<Button type="submit">Save</Button>);
+
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'submit');
+  });
+
+  // Definition of done: "forms cannot be double-submitted".
+  it('is disabled and marked busy while loading, so a second click cannot fire', async () => {
+    const onClick = vi.fn();
+    render(
+      <Button loading onClick={onClick}>
+        Logging in…
+      </Button>
+    );
+
+    const button = screen.getByRole('button', { name: 'Logging in…' });
+
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('keeps its accessible name while loading rather than swapping it for a spinner', () => {
+    render(<Button loading>Register</Button>);
+
+    expect(screen.getByRole('button', { name: 'Register' })).toBeInTheDocument();
+  });
+
+  it('is not busy when idle', () => {
+    render(<Button>Register</Button>);
+
+    const button = screen.getByRole('button');
+    expect(button).not.toBeDisabled();
+    expect(button).not.toHaveAttribute('aria-busy');
   });
 });
 
@@ -154,7 +203,11 @@ describe('PublicCard', () => {
     expect(
       screen.getByRole('heading', { name: 'Prepare project report' })
     ).toBeInTheDocument();
-    expect(screen.getByText('Checklist (1/2)')).toBeInTheDocument();
+
+    // Progress is asserted through the accessible name rather than the visible
+    // "1/2", so the test survives the count being restyled.
+    expect(screen.getByLabelText('1 of 2 items complete')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Checklist' })).toBeInTheDocument();
   });
 
   it('renders an unassigned shared task without crashing', () => {
@@ -177,8 +230,11 @@ describe('PublicCard', () => {
   it('handles a task with no checklist items', () => {
     render(<PublicCard task={{ ...baseTask, checklists: [] }} />);
 
-    expect(screen.getByText('Checklist (0/0)')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Checklist' })).toBeInTheDocument();
+    expect(screen.getByText('0/0')).toBeInTheDocument();
     expect(screen.getByText(/no checklist items/i)).toBeInTheDocument();
+    // No progress meter at all when there is nothing to measure.
+    expect(screen.queryByLabelText(/items complete/i)).not.toBeInTheDocument();
   });
 
   it('labels each checklist item so the checkbox has an accessible name', () => {
