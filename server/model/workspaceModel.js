@@ -17,18 +17,15 @@ const workspaceSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      // Mongoose applies setters before validators, so `trim` turns a
+      // whitespace-only name into '' and `required` then rejects it. No
+      // separate "not blank" validator is needed — one here would never run.
       required: [true, 'Workspace name is required.'],
       trim: true,
       maxLength: [
         MAX_NAME_LENGTH,
         `Workspace name cannot be longer than ${MAX_NAME_LENGTH} characters.`,
       ],
-      validate: {
-        // `trim` turns "   " into "", but `required` has already passed by
-        // then, so a whitespace-only name would otherwise slip through.
-        validator: (value) => typeof value === 'string' && value.trim().length > 0,
-        message: 'Workspace name cannot be empty.',
-      },
     },
 
     description: {
@@ -62,6 +59,25 @@ const workspaceSchema = new mongoose.Schema(
         message: 'The workspace owner must be an existing user.',
       },
     },
+
+    /**
+     * Marks the one workspace a user gets automatically.
+     *
+     * Added in Stage 4 because ownership alone could not identify it. Once a
+     * user can create additional workspaces, `findOne({ owner })` returns an
+     * arbitrary document, so a re-run of the migration could bind tasks and
+     * memberships to the wrong workspace. The partial unique index below makes
+     * "at most one personal workspace per user" a database guarantee rather
+     * than a convention the migration has to remember.
+     *
+     * Immutable: a personal workspace cannot be demoted into an ordinary one,
+     * which would leave the user without a fallback board.
+     */
+    isPersonal: {
+      type: Boolean,
+      default: false,
+      immutable: true,
+    },
   },
   { timestamps: true }
 );
@@ -71,6 +87,15 @@ const workspaceSchema = new mongoose.Schema(
 // it idempotent), by ownership transfer, and by the guard that stops an owner
 // deleting their last workspace. Without this it is a collection scan.
 workspaceSchema.index({ owner: 1 });
+
+// At most one personal workspace per user, enforced by the database.
+// Partial rather than sparse for the usual reason: a sparse unique index still
+// indexes explicit `false` values, so every ordinary workspace would collide
+// with every other one belonging to the same owner.
+workspaceSchema.index(
+  { owner: 1, isPersonal: 1 },
+  { unique: true, partialFilterExpression: { isPersonal: true } }
+);
 
 const Workspace = mongoose.model('Workspace', workspaceSchema);
 

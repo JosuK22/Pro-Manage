@@ -98,6 +98,13 @@ module.exports = (err, req, res, next) => {
     if (!error.isOperational) {
       console.error('Unhandled error:', err && err.stack ? err.stack : err);
     }
+
+    // Authorization denials carry two messages: a diagnostic one naming the
+    // role, permission or workspace, and a deliberately vague public one.
+    // Only the public one may cross the wire, or the error text becomes a way
+    // to map out a workspace the caller has no access to.
+    if (error.publicMessage) body.message = error.publicMessage;
+
     return res.status(statusCode).json(body);
   }
 

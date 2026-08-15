@@ -41,14 +41,14 @@ describe('RBAC models', () => {
       await expect(Workspace.create({ owner: user._id })).rejects.toThrow(/name is required/i);
     });
 
-    // `trim` empties the string *after* `required` has already passed, so a
-    // whitespace-only name needs its own guard.
+    // Setters run before validators, so '    ' is trimmed to '' and caught by
+    // `required` rather than by a separate blank check.
     it('rejects a whitespace-only name', async () => {
       const { user } = await createUser();
 
       await expect(
         Workspace.create({ owner: user._id, name: '    ' })
-      ).rejects.toThrow(/cannot be empty/i);
+      ).rejects.toThrow(/name is required/i);
     });
 
     it('trims the name', async () => {
@@ -449,6 +449,35 @@ describe('RBAC models', () => {
       });
 
       expect(task.workspace.equals(workspace._id)).toBe(true);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // The suite's afterEach wipes `mongoose.connection.collections`. That should
+  // pick up the new collections automatically, but "should" is not "does" —
+  // if it silently missed one, every uniqueness test above would start failing
+  // in ways that look like model bugs.
+  describe('test isolation covers the new collections', () => {
+    it('leaves documents behind within a single test', async () => {
+      const setup = await setupWorkspace();
+      await WorkspaceInvitation.create({
+        workspace: setup.workspace._id,
+        email: 'leftover@example.com',
+        role: setup.roles.member._id,
+        invitedBy: setup.owner.user._id,
+      });
+
+      expect(await Workspace.countDocuments()).toBeGreaterThan(0);
+      expect(await Role.countDocuments()).toBeGreaterThan(0);
+      expect(await WorkspaceMembership.countDocuments()).toBeGreaterThan(0);
+      expect(await WorkspaceInvitation.countDocuments()).toBeGreaterThan(0);
+    });
+
+    it('starts the next test with all four collections empty', async () => {
+      expect(await Workspace.countDocuments()).toBe(0);
+      expect(await Role.countDocuments()).toBe(0);
+      expect(await WorkspaceMembership.countDocuments()).toBe(0);
+      expect(await WorkspaceInvitation.countDocuments()).toBe(0);
     });
   });
 

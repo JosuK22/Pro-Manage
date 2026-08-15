@@ -19,10 +19,9 @@
 const request = require('supertest');
 
 const app = require('../app');
-const Workspace = require('../model/workspaceModel');
 const Role = require('../model/roleModel');
 const WorkspaceMembership = require('../model/workspaceMembershipModel');
-const { SYSTEM_ROLES, SYSTEM_ROLE_RANK } = require('../model/roleModel');
+const { provisionWorkspace } = require('../services/workspaceProvisioning');
 
 const DEFAULT_PASSWORD = 'a-good-long-password';
 
@@ -95,15 +94,12 @@ const createUser = async (overrides = {}) => {
 
   if (!withWorkspace) return actor;
 
+  // `provisionWorkspace` already creates the owner's membership, so there is
+  // no separate createMember call here.
   const { workspace, roles } = await createWorkspace({
-    owner: actor.user._id,
+    owner: actor.user,
     name: workspaceName ?? `${payload.name}'s Workspace`,
-  });
-
-  await createMember({
-    workspace,
-    user: actor.user._id,
-    role: roles.owner,
+    isPersonal: true,
   });
 
   return { ...actor, workspace, roles };
@@ -116,70 +112,24 @@ const createUser = async (overrides = {}) => {
  * the test's own setup — a hidden side effect that silently creates three
  * documents makes failures much harder to read.
  */
-const createWorkspace = async ({ owner, name = 'Test Workspace', description = '' } = {}) => {
-  const workspace = await Workspace.create({ owner, name, description });
+const createWorkspace = async ({
+  owner,
+  name = 'Test Workspace',
+  description = '',
+  isPersonal = false,
+} = {}) => {
+  // Delegates to the production provisioning service rather than restating the
+  // role definitions. Stage 3 had these spelled out here, which meant the
+  // migration would have needed a second copy — the exact drift the Stage 3
+  // report warned about.
+  const { workspace, roles } = await provisionWorkspace({
+    owner,
+    name,
+    description,
+    isPersonal,
+  });
 
-  const [ownerRole, adminRole, memberRole] = await Promise.all([
-    Role.create({
-      workspace: workspace._id,
-      name: 'Owner',
-      description: 'Full authority over the workspace.',
-      isSystemRole: true,
-      systemKey: SYSTEM_ROLES.OWNER,
-      rank: SYSTEM_ROLE_RANK.OWNER,
-    }),
-    Role.create({
-      workspace: workspace._id,
-      name: 'Admin',
-      description: 'Manages members, roles and tasks.',
-      isSystemRole: true,
-      systemKey: SYSTEM_ROLES.ADMIN,
-      rank: SYSTEM_ROLE_RANK.ADMIN,
-      permissions: [
-        { key: 'workspace.view' },
-        { key: 'workspace.edit' },
-        { key: 'members.view' },
-        { key: 'members.invite' },
-        { key: 'members.remove' },
-        { key: 'members.assign_role' },
-        { key: 'roles.view' },
-        { key: 'roles.create' },
-        { key: 'roles.edit' },
-        { key: 'roles.delete' },
-        { key: 'tasks.view', scope: 'workspace' },
-        { key: 'tasks.create' },
-        { key: 'tasks.edit', scope: 'workspace' },
-        { key: 'tasks.delete', scope: 'workspace' },
-        { key: 'tasks.assign' },
-        { key: 'tasks.change_status', scope: 'workspace' },
-        { key: 'analytics.view', scope: 'workspace' },
-      ],
-    }),
-    Role.create({
-      workspace: workspace._id,
-      name: 'Member',
-      description: 'Works on the tasks assigned to them.',
-      isSystemRole: true,
-      systemKey: SYSTEM_ROLES.MEMBER,
-      rank: SYSTEM_ROLE_RANK.MEMBER,
-      isDefault: true,
-      // Deliberately no tasks.delete — assignment and deletion are separate
-      // concepts under the new model.
-      permissions: [
-        { key: 'workspace.view' },
-        { key: 'members.view' },
-        { key: 'tasks.view', scope: 'assigned' },
-        { key: 'tasks.change_status', scope: 'assigned' },
-        { key: 'tasks.manage_checklists', scope: 'assigned' },
-        { key: 'analytics.view', scope: 'own' },
-      ],
-    }),
-  ]);
-
-  return {
-    workspace,
-    roles: { owner: ownerRole, admin: adminRole, member: memberRole },
-  };
+  return { workspace, roles };
 };
 
 /** A custom role. `permissions` accepts `'tasks.view'` or `{ key, scope }`. */

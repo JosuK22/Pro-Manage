@@ -13,6 +13,7 @@ const authRouter = require('./routes/authRoute');
 const taskRouter = require('./routes/taskRoute');
 const userRouter = require('./routes/userRoute');
 const assigneeRouter = require('./routes/assigneeRoute');
+const workspaceRouter = require('./routes/workspaceRoute');
 
 const app = express();
 
@@ -68,6 +69,15 @@ app.use('/api/v1/auth', authLimiter, authRouter);
 app.use('/api/v1/tasks', taskRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/assignees', assigneeRouter);
+
+// Workspace member and invitation management. Existing task/user/assignee
+// routes are untouched — they are not yet workspace-aware, which is the
+// integration stage's job.
+app.use('/api/v1/workspaces', workspaceRouter);
+
+// Acceptance sits outside the workspace path: the accepting user is not a
+// member yet, so there is no workspace to scope the request to.
+app.use('/api/v1/invitations', workspaceRouter.acceptRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Cannot ${req.method} ${req.originalUrl}`, 404));

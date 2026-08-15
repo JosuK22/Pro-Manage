@@ -86,16 +86,14 @@ const roleSchema = new mongoose.Schema(
 
     name: {
       type: String,
+      // As on Workspace: `trim` runs before validation, so a whitespace-only
+      // name arrives at `required` as '' and is rejected there.
       required: [true, 'Role name is required.'],
       trim: true,
       maxLength: [
         MAX_NAME_LENGTH,
         `Role name cannot be longer than ${MAX_NAME_LENGTH} characters.`,
       ],
-      validate: {
-        validator: (value) => typeof value === 'string' && value.trim().length > 0,
-        message: 'Role name cannot be empty.',
-      },
     },
 
     description: {

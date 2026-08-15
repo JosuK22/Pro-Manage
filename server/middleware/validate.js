@@ -252,9 +252,157 @@ const validateAssignee = (req, res, next) => {
   next();
 };
 
+/**
+ * Build a field-error AppError and hand it to `next()`.
+ *
+ * The `fail` helper above throws, which suits the parse functions it is used
+ * from; middleware needs to pass the error along instead.
+ */
+const failWith = (errors, next) => {
+  const error = new AppError('Some of the values you entered are not valid.', 400);
+  error.errors = errors;
+  return next(error);
+};
+
+/** Invitation creation: an email and the role being offered. */
+const validateInvitation = (req, res, next) => {
+  const errors = {};
+  const { email, roleId } = req.body;
+
+  if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
+    errors.email = 'Please enter a valid email address.';
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(String(roleId))) {
+    errors.roleId = 'Please choose a role.';
+  }
+
+  if (Object.keys(errors).length) return failWith(errors, next);
+
+  next();
+};
+
+/** Role assignment: only the role id is accepted from the body. */
+const validateRoleAssignment = (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(String(req.body.roleId))) {
+    return failWith({ roleId: 'Please choose a role.' }, next);
+  }
+
+  next();
+};
+
+/**
+ * Invitation acceptance.
+ *
+ * Only shape is checked here. Whether the token is real, current or already
+ * used is decided by the service, which answers every failure identically so
+ * the endpoint cannot be used to probe which tokens existed.
+ */
+const validateInvitationToken = (req, res, next) => {
+  const { token } = req.body;
+
+  if (typeof token !== 'string' || token.trim().length < 16) {
+    return failWith({ token: 'This invitation link is not valid.' }, next);
+  }
+
+  next();
+};
+
+/** Member/invitation list filters. */
+const validateMemberQuery = (req, res, next) => {
+  const { status, page, limit } = req.query;
+
+  const allowed = ['active', 'suspended', 'pending', 'accepted', 'expired', 'revoked'];
+
+  if (status !== undefined && !allowed.includes(status)) {
+    return next(new AppError('Unknown status filter.', 400));
+  }
+
+  for (const [name, value] of [['page', page], ['limit', limit]]) {
+    if (value !== undefined && (!/^\d+$/.test(String(value)) || Number(value) < 1)) {
+      return next(new AppError(`'${name}' must be a positive whole number.`, 400));
+    }
+  }
+
+  next();
+};
+
+/**
+ * Shape checks for a submitted permission list.
+ *
+ * Deliberately shallow: whether a key exists in the catalogue, whether its
+ * scope is supported, and whether the actor may grant it are all decided by the
+ * role service and the authorization engine. This only rejects submissions that
+ * are not the right *shape* to reason about.
+ */
+const validatePermissionsShape = (permissions, errors) => {
+  if (!Array.isArray(permissions)) {
+    errors.permissions = 'Permissions must be a list.';
+    return;
+  }
+
+  const malformed = permissions.some(
+    (entry) =>
+      typeof entry !== 'string' &&
+      (!isPlainObject(entry) || typeof entry.key !== 'string')
+  );
+
+  if (malformed) {
+    errors.permissions = 'Each permission must be a key, or an object with a key.';
+  }
+};
+
+const validateRoleCreate = (req, res, next) => {
+  const errors = {};
+  const { name, description, permissions } = req.body;
+
+  if (typeof name !== 'string' || !name.trim()) {
+    errors.name = 'A role name is required.';
+  }
+
+  if (description !== undefined && typeof description !== 'string') {
+    errors.description = 'Description must be text.';
+  }
+
+  if (permissions !== undefined) validatePermissionsShape(permissions, errors);
+
+  if (Object.keys(errors).length) return failWith(errors, next);
+
+  next();
+};
+
+const validateRoleUpdate = (req, res, next) => {
+  const errors = {};
+  const { name, description, permissions } = req.body;
+
+  if (name !== undefined && (typeof name !== 'string' || !name.trim())) {
+    errors.name = 'A role name cannot be empty.';
+  }
+
+  if (description !== undefined && typeof description !== 'string') {
+    errors.description = 'Description must be text.';
+  }
+
+  if (permissions !== undefined) validatePermissionsShape(permissions, errors);
+
+  if (name === undefined && description === undefined && permissions === undefined) {
+    return next(new AppError('No updatable fields were provided.', 400));
+  }
+
+  if (Object.keys(errors).length) return failWith(errors, next);
+
+  next();
+};
+
 module.exports = {
   EMAIL_REGEX,
   validateObjectIdParam,
+  validateRoleCreate,
+  validateRoleUpdate,
+  validateInvitation,
+  validateRoleAssignment,
+  validateInvitationToken,
+  validateMemberQuery,
   validateTaskCreate,
   validateTaskUpdate,
   validateTaskQuery,
